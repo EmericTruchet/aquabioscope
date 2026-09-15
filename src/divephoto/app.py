@@ -11,8 +11,9 @@ from divephoto.imaging.loader import load_rgb, make_thumbnail
 from divephoto.session import DiveSession
 from divephoto.ui.onboarding import OnboardingWidget
 from divephoto.ui.review import ReviewWidget
+from divephoto.ui.theme import STYLESHEET
 
-REVIEW_THUMB_SIZE = 520
+REVIEW_THUMB_SIZE = 900
 
 
 class MainWindow(QMainWindow):
@@ -90,6 +91,7 @@ class MainWindow(QMainWindow):
 
 def main() -> None:
     app = QApplication(sys.argv)
+    app.setStyleSheet(STYLESHEET)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
