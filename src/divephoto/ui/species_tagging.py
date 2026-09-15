@@ -11,10 +11,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QImage, QKeySequence, QPixmap, QShortcut
+from PySide6.QtCore import QUrl, Qt, Signal
+from PySide6.QtGui import QDesktopServices, QImage, QKeySequence, QPixmap, QShortcut
 from PySide6.QtWidgets import (
-    QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton,
+    QApplication, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton,
     QSizePolicy, QVBoxLayout, QWidget,
 )
 
@@ -22,6 +22,7 @@ from divephoto.species import SpeciesCatalog, SpeciesEntry
 from divephoto.ui.flow_layout import FlowLayout
 
 UNLISTED_EMBRANCHEMENT = "À préciser"
+GOOGLE_LENS_URL = "https://lens.google.com/upload"
 
 
 def _rgb_to_pixmap(rgb: np.ndarray) -> QPixmap:
@@ -87,6 +88,7 @@ class SpeciesTagWidget(QWidget):
         self.catalog = catalog or SpeciesCatalog()
         self.region: str | None = None
         self._current_path: Path | None = None
+        self._current_rgb: np.ndarray | None = None
         self._selected: list[SpeciesEntry] = []
 
         self.progress_label = QLabel()
@@ -104,6 +106,18 @@ class SpeciesTagWidget(QWidget):
         self.preview.setFixedSize(260, 195)
         self.preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.preview.setScaledContents(False)
+
+        self.lens_btn = QPushButton("🔍 Chercher avec Google Lens")
+        self.lens_btn.setObjectName("SecondaryButton")
+        self.lens_btn.setToolTip(
+            "Copie la photo dans le presse-papiers et ouvre Google Lens dans le navigateur "
+            "— colle-la (Ctrl+V) sur la page pour lancer la recherche visuelle."
+        )
+        self.lens_btn.clicked.connect(self._search_with_google_lens)
+        self.lens_hint = QLabel("")
+        self.lens_hint.setObjectName("HintBar")
+        self.lens_hint.setWordWrap(True)
+        self.lens_hint.setFixedWidth(260)
 
         title = QLabel("Quelles espèces sont visibles sur cette photo ?")
         title.setObjectName("Subtitle")
@@ -144,6 +158,9 @@ class SpeciesTagWidget(QWidget):
 
         left_col = QVBoxLayout()
         left_col.addWidget(self.preview)
+        left_col.addSpacing(8)
+        left_col.addWidget(self.lens_btn)
+        left_col.addWidget(self.lens_hint)
         left_col.addStretch()
 
         right_col = QVBoxLayout()
@@ -172,10 +189,12 @@ class SpeciesTagWidget(QWidget):
 
     def show_photo(self, path: Path, rgb_thumb: np.ndarray, index: int, total: int, region: str | None) -> None:
         self._current_path = path
+        self._current_rgb = rgb_thumb
         self.region = region
         self._selected = []
         self.progress_label.setText(f"Photo {index + 1} / {total}")
         self.filename_label.setText(path.name)
+        self.lens_hint.setText("")
 
         pixmap = _rgb_to_pixmap(rgb_thumb).scaled(
             self.preview.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
@@ -186,6 +205,13 @@ class SpeciesTagWidget(QWidget):
         self._rebuild_chips()
         self._refresh_results()
         self.search_edit.setFocus()
+
+    def _search_with_google_lens(self) -> None:
+        if self._current_rgb is None:
+            return
+        QApplication.clipboard().setImage(_rgb_to_pixmap(self._current_rgb).toImage())
+        QDesktopServices.openUrl(QUrl(GOOGLE_LENS_URL))
+        self.lens_hint.setText("Photo copiée — colle-la (Ctrl+V) sur la page Google Lens qui vient de s'ouvrir.")
 
     def _on_query_changed(self, text: str) -> None:
         self.add_custom_btn.setEnabled(bool(text.strip()))
