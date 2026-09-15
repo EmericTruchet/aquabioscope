@@ -14,7 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QPointF, Qt, Signal
 from PySide6.QtGui import QImage, QKeySequence, QPixmap, QShortcut
 from PySide6.QtWidgets import (
     QHBoxLayout, QLabel, QMessageBox, QPushButton, QSizePolicy, QVBoxLayout, QWidget,
@@ -40,8 +40,16 @@ def _rgb_to_pixmap(rgb: np.ndarray) -> QPixmap:
     return QPixmap.fromImage(qimg.copy())
 
 
+MIN_ZOOM = 1.0
+MAX_ZOOM = 8.0
+_DRAG_THRESHOLD = 4  # px, en-dessous duquel un clic-relâché est traité comme un clic (pas un glissé)
+
+
 class _ScalablePreview(QLabel):
-    """Aperçu principal : conserve le pixmap source et se redimensionne avec la fenêtre."""
+    """Aperçu principal : se redimensionne avec la fenêtre, et permet de
+    zoomer (molette, centré sur le curseur) et de se déplacer dans l'image
+    zoomée (glisser-déposer). Un clic simple (sans glissé, hors zoom)
+    valide le choix, comme avant."""
 
     clicked = Signal()
 
@@ -53,26 +61,119 @@ class _ScalablePreview(QLabel):
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self._source: QPixmap | None = None
+        self._zoom = MIN_ZOOM
+        self._pan = QPointF(0, 0)  # decalage (px, espace image mise a l'echelle) par rapport au centre
+        self._drag_start: QPointF | None = None
+        self._pan_at_drag_start = QPointF(0, 0)
+        self._dragged = False
 
     def set_source_pixmap(self, pixmap: QPixmap) -> None:
         self._source = pixmap
+        self._rescale()
+
+    def reset_zoom(self) -> None:
+        self._zoom = MIN_ZOOM
+        self._pan = QPointF(0, 0)
         self._rescale()
 
     def resizeEvent(self, event) -> None:  # noqa: N802
         super().resizeEvent(event)
         self._rescale()
 
+    def _fit_size(self) -> tuple[float, float]:
+        src = self._source
+        w, h = self.width(), self.height()
+        if w <= 0 or h <= 0 or src.width() <= 0 or src.height() <= 0:
+            return (1.0, 1.0)
+        fit_scale = min(w / src.width(), h / src.height())
+        return (src.width() * fit_scale, src.height() * fit_scale)
+
     def _rescale(self) -> None:
         if self._source is None or self._source.isNull():
             return
+        fit_w, fit_h = self._fit_size()
+        scaled_w, scaled_h = fit_w * self._zoom, fit_h * self._zoom
+
         scaled = self._source.scaled(
-            self.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
+            round(scaled_w), round(scaled_h),
+            Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation,
         )
-        self.setPixmap(scaled)
+
+        widget_w, widget_h = self.width(), self.height()
+        max_pan_x = max(0.0, (scaled_w - widget_w) / 2)
+        max_pan_y = max(0.0, (scaled_h - widget_h) / 2)
+        self._pan.setX(max(-max_pan_x, min(max_pan_x, self._pan.x())))
+        self._pan.setY(max(-max_pan_y, min(max_pan_y, self._pan.y())))
+
+        origin_x = round((scaled_w - widget_w) / 2 - self._pan.x())
+        origin_y = round((scaled_h - widget_h) / 2 - self._pan.y())
+        origin_x = max(0, min(origin_x, max(0, scaled.width() - widget_w)))
+        origin_y = max(0, min(origin_y, max(0, scaled.height() - widget_h)))
+        crop_w = min(widget_w, scaled.width())
+        crop_h = min(widget_h, scaled.height())
+
+        self.setPixmap(scaled.copy(origin_x, origin_y, crop_w, crop_h))
+
+    def wheelEvent(self, event) -> None:  # noqa: N802
+        if self._source is None or self._source.isNull():
+            return
+        delta = event.angleDelta().y()
+        if delta == 0:
+            return
+        factor = 1.15 if delta > 0 else 1 / 1.15
+        new_zoom = max(MIN_ZOOM, min(MAX_ZOOM, self._zoom * factor))
+        if new_zoom == self._zoom:
+            return
+
+        fit_w, fit_h = self._fit_size()
+        widget_w, widget_h = self.width(), self.height()
+        old_scaled_w, old_scaled_h = fit_w * self._zoom, fit_h * self._zoom
+        cursor = event.position()
+
+        old_origin_x = (old_scaled_w - widget_w) / 2 - self._pan.x()
+        old_origin_y = (old_scaled_h - widget_h) / 2 - self._pan.y()
+        # point vise (dans l'image mise a l'echelle courante), en fraction [0,1]
+        frac_x = (old_origin_x + cursor.x()) / old_scaled_w if old_scaled_w else 0.5
+        frac_y = (old_origin_y + cursor.y()) / old_scaled_h if old_scaled_h else 0.5
+
+        self._zoom = new_zoom
+        new_scaled_w, new_scaled_h = fit_w * self._zoom, fit_h * self._zoom
+        new_origin_x = frac_x * new_scaled_w - cursor.x()
+        new_origin_y = frac_y * new_scaled_h - cursor.y()
+        self._pan = QPointF(
+            (new_scaled_w - widget_w) / 2 - new_origin_x,
+            (new_scaled_h - widget_h) / 2 - new_origin_y,
+        )
+        self._rescale()
 
     def mousePressEvent(self, event) -> None:  # noqa: N802
         super().mousePressEvent(event)
-        self.clicked.emit()
+        self._drag_start = event.position()
+        self._pan_at_drag_start = QPointF(self._pan)
+        self._dragged = False
+
+    def mouseMoveEvent(self, event) -> None:  # noqa: N802
+        super().mouseMoveEvent(event)
+        if self._drag_start is None or self._source is None:
+            return
+        delta = event.position() - self._drag_start
+        if delta.manhattanLength() > _DRAG_THRESHOLD:
+            self._dragged = True
+        if self._dragged:
+            self._pan = self._pan_at_drag_start + delta
+            self._rescale()
+
+    def mouseReleaseEvent(self, event) -> None:  # noqa: N802
+        super().mouseReleaseEvent(event)
+        was_dragged = self._dragged
+        self._drag_start = None
+        self._dragged = False
+        if not was_dragged and self._zoom <= MIN_ZOOM + 1e-6:
+            self.clicked.emit()
+
+    def mouseDoubleClickEvent(self, event) -> None:  # noqa: N802
+        super().mouseDoubleClickEvent(event)
+        self.reset_zoom()
 
 
 class _GalleryThumb(QWidget):
@@ -196,7 +297,8 @@ class ReviewWidget(QWidget):
             self._add_named_tile(name)
 
         hint = QLabel(
-            "Clique sur l'aperçu (ou Entrée) pour valider  •  1-4 pour les presets fixes  •  "
+            "Clique sur l'aperçu (ou Entrée) pour valider  •  molette pour zoomer, glisser pour se déplacer, "
+            "double-clic pour réinitialiser  •  1-4 pour les presets fixes  •  "
             "clic droit sur un preset personnalisé pour le supprimer  •  Suppr pour écarter la photo"
         )
         hint.setObjectName("HintBar")
@@ -233,6 +335,7 @@ class ReviewWidget(QWidget):
         """Affiche une nouvelle photo (déjà décodée + réduite) avec toutes ses versions."""
         self._current_path = path
         self._current_thumb = rgb_thumb
+        self.preview.reset_zoom()
         self.progress_label.setText(f"Photo {index + 1} / {total}")
         self.filename_label.setText(path.name)
 

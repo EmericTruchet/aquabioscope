@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QUrl, Qt, Signal
+from PySide6.QtCore import QTimer, QUrl, Qt, Signal
 from PySide6.QtGui import QDesktopServices, QImage, QKeySequence, QPixmap, QShortcut
 from PySide6.QtWidgets import (
     QApplication, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton,
@@ -127,6 +127,14 @@ class SpeciesTagWidget(QWidget):
         self.search_edit.textChanged.connect(self._on_query_changed)
         self.search_edit.returnPressed.connect(self._on_return_pressed)
 
+        # La recherche floue (secours quand rien ne matche exactement) reste
+        # coûteuse sur ~2000 entrées : on ne relance la recherche que quand
+        # la frappe marque une pause, pas à chaque caractère.
+        self._search_debounce = QTimer(self)
+        self._search_debounce.setSingleShot(True)
+        self._search_debounce.setInterval(150)
+        self._search_debounce.timeout.connect(self._refresh_results)
+
         self.add_custom_btn = QPushButton("+ Ajouter comme espèce non répertoriée")
         self.add_custom_btn.setObjectName("SecondaryButton")
         self.add_custom_btn.setEnabled(False)
@@ -215,7 +223,7 @@ class SpeciesTagWidget(QWidget):
 
     def _on_query_changed(self, text: str) -> None:
         self.add_custom_btn.setEnabled(bool(text.strip()))
-        self._refresh_results()
+        self._search_debounce.start()
 
     def _refresh_results(self) -> None:
         self.results_list.clear()
@@ -235,6 +243,9 @@ class SpeciesTagWidget(QWidget):
         self._add_species(entry)
 
     def _on_return_pressed(self) -> None:
+        if self._search_debounce.isActive():
+            self._search_debounce.stop()
+            self._refresh_results()
         if self.results_list.count() > 0:
             entry = self.results_list.item(0).data(Qt.ItemDataRole.UserRole)
             self._add_species(entry)

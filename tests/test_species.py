@@ -39,6 +39,40 @@ class SpeciesTest(unittest.TestCase):
         med_count = len(self.catalog.search("", region="mediterranee"))
         self.assertLessEqual(med_count, all_count)
 
+    def test_plural_query_finds_singular_entry_and_vice_versa(self) -> None:
+        catalog = SpeciesCatalog([
+            SpeciesEntry("Cnidaire", "Anémone encroûtante jaune", "Parazoanthus axinellae", ("mediterranee",)),
+        ])
+        self.assertEqual(len(catalog.search("anemones encroutantes jaunes")), 1)
+        self.assertEqual(len(catalog.search("anemone encroutante jaune")), 1)
+
+    def test_fuzzy_fallback_tolerates_typo_when_no_exact_match(self) -> None:
+        catalog = SpeciesCatalog([
+            SpeciesEntry("Ver", "Salmacine de Dysteri", "Salmacina dysteri", ("mediterranee",)),
+        ])
+        results = catalog.search("salmacine")  # faute de frappe plausible sur "Salmacina"
+        self.assertEqual(len(results), 1)
+
+    def test_fuzzy_fallback_does_not_trigger_when_exact_match_exists(self) -> None:
+        # Le flou ne doit pas polluer une recherche qui a deja une reponse
+        # exacte nette (evite le bruit et le cout de calcul inutile).
+        catalog = SpeciesCatalog([
+            SpeciesEntry("Cnidaire", "Bonellie verte", "Bonellia viridis", ("mediterranee",)),
+            SpeciesEntry("Poissons osseux", "Donzelle douce", "Ophidion rochei", ("mediterranee",)),
+        ])
+        results = catalog.search("bonellie")
+        self.assertEqual([e.nom_vernaculaire for e in results], ["Bonellie verte"])
+
+    def test_fuzzy_fallback_on_compound_query_matches_significant_word(self) -> None:
+        catalog = SpeciesCatalog([
+            SpeciesEntry("Bryozoaire", "Dentelle des grottes", "Reteporella mediterranea", ("mediterranee",)),
+        ])
+        # "retepolle" est une coquille plausible pour "Reteporella"; le mot
+        # invente "cavernicolexx" ne doit pas empecher de retrouver l'entree
+        # via l'autre mot significatif de la requete.
+        results = catalog.search("retepolle cavernicolexx")
+        self.assertIn("Reteporella mediterranea", [e.nom_scientifique for e in results])
+
 
 if __name__ == "__main__":
     unittest.main()
