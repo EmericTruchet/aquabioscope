@@ -6,6 +6,7 @@ from pathlib import Path
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget
 
+from divephoto.imaging.color import CustomPresetParams
 from divephoto.imaging.loader import load_rgb, make_thumbnail
 from divephoto.session import DiveSession
 from divephoto.species import SpeciesCatalog, SpeciesEntry
@@ -28,7 +29,7 @@ class MainWindow(QMainWindow):
         self.session: DiveSession | None = None
         self.photos: list[Path] = []
         self.current_index = 0
-        self.choices: dict[str, str | None] = {}
+        self.choices: dict[str, str | CustomPresetParams | None] = {}
         self.species_tags: dict[str, list[SpeciesEntry]] = {}
         self._current_thumb = None
         self.export_worker: ExportWorker | None = None

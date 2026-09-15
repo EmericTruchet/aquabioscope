@@ -9,6 +9,7 @@ Les fonctions de bas niveau sont combinées en 3 presets (voir `PRESETS`) :
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Callable
 
 import cv2
@@ -109,3 +110,26 @@ PRESETS: dict[str, Callable[[np.ndarray], np.ndarray]] = {
     "profondeur": preset_profondeur,
     "macro": preset_macro,
 }
+
+
+@dataclass
+class CustomPresetParams:
+    """Réglages d'un preset "+" personnalisé, ajustés à la main pour une photo."""
+
+    red_strength: float = 0.7   # compensation rouge/bleu (restore_red_channel), 0-2
+    gray_balance: float = 0.5   # rééquilibrage gray-world, 0-1
+    contrast: float = 1.5       # contraste local CLAHE (clip limit), 0 = désactivé, 0-4
+    sharpen: float = 0.0        # netteté (unsharp mask), 0 = désactivé, 0-1
+    saturation: float = 1.10    # 0.5-2.0
+
+
+def apply_custom_preset(rgb_uint8: np.ndarray, params: CustomPresetParams) -> np.ndarray:
+    f = rgb_uint8.astype(np.float32) / 255
+    f = restore_red_channel(f, strength=params.red_strength)
+    f = gray_world_balance(f, strength=params.gray_balance, max_gain=1.6)
+    out = (f * 255).astype(np.uint8)
+    if params.contrast > 0:
+        out = apply_clahe(out, clip_limit=params.contrast)
+    if params.sharpen > 0:
+        out = unsharp_mask(out, amount=params.sharpen)
+    return adjust_saturation(out, params.saturation)

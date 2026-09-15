@@ -18,7 +18,8 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget,
 )
 
-from divephoto.imaging.color import PRESETS
+from divephoto.imaging.color import PRESETS, CustomPresetParams, apply_custom_preset
+from divephoto.ui.custom_preset_dialog import CustomPresetDialog
 
 _TILES: list[tuple[str, str]] = [
     ("original", "Original"),
@@ -26,6 +27,8 @@ _TILES: list[tuple[str, str]] = [
     ("profondeur", "Corrigé profondeur"),
     ("macro", "Macro contraste"),
 ]
+CUSTOM_KEY = "custom"
+CUSTOM_LABEL = "+ Personnalisé"
 DEFAULT_PRESET = "naturel"
 
 
@@ -123,8 +126,10 @@ class ReviewWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
         self._current_path: Path | None = None
+        self._current_thumb: np.ndarray | None = None
         self._versions: dict[str, QPixmap] = {}
         self._selected_key = DEFAULT_PRESET
+        self._custom_params: CustomPresetParams | None = None
 
         self.progress_label = QLabel()
         self.progress_label.setObjectName("ProgressBadge")
@@ -148,10 +153,16 @@ class ReviewWidget(QWidget):
             thumb.clicked.connect(self._select)
             gallery.addWidget(thumb)
             self._thumbs[key] = thumb
+
+        custom_thumb = _GalleryThumb(CUSTOM_KEY, CUSTOM_LABEL)
+        custom_thumb.clicked.connect(lambda _key: self._open_custom_dialog())
+        gallery.addWidget(custom_thumb)
+        self._thumbs[CUSTOM_KEY] = custom_thumb
         gallery.addStretch()
 
         hint = QLabel(
-            "Clique sur l'aperçu (ou Entrée) pour valider  •  1-4 pour changer de version  •  Suppr pour écarter la photo"
+            "Clique sur l'aperçu (ou Entrée) pour valider  •  1-4 pour changer de version  •  "
+            "5 pour un réglage personnalisé  •  Suppr pour écarter la photo"
         )
         hint.setObjectName("HintBar")
         hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -179,6 +190,7 @@ class ReviewWidget(QWidget):
 
         for i, (key, _label) in enumerate(_TILES):
             QShortcut(QKeySequence(str(i + 1)), self, activated=lambda k=key: self._select(k))
+        QShortcut(QKeySequence("5"), self, activated=self._open_custom_dialog)
         QShortcut(QKeySequence(Qt.Key.Key_Return), self, activated=self._confirm)
         QShortcut(QKeySequence(Qt.Key.Key_Enter), self, activated=self._confirm)
         QShortcut(QKeySequence(Qt.Key.Key_Delete), self, activated=self._delete)
@@ -186,6 +198,8 @@ class ReviewWidget(QWidget):
     def show_photo(self, path: Path, rgb_thumb: np.ndarray, index: int, total: int) -> None:
         """Affiche une nouvelle photo (déjà décodée + réduite) avec ses 4 versions."""
         self._current_path = path
+        self._current_thumb = rgb_thumb
+        self._custom_params = None
         self.progress_label.setText(f"Photo {index + 1} / {total}")
         self.filename_label.setText(path.name)
 
@@ -196,9 +210,14 @@ class ReviewWidget(QWidget):
             self._versions[key] = pixmap
             self._thumbs[key].set_pixmap(pixmap)
 
+        self._versions.pop(CUSTOM_KEY, None)
+        self._thumbs[CUSTOM_KEY].image_label.clear()
+
         # Choix "maintenu" : on garde le dernier preset choisi comme point de
-        # depart pour la photo suivante (souvent la meme lumiere/scene).
-        self._select(self._selected_key)
+        # depart pour la photo suivante (souvent la meme lumiere/scene) — sauf
+        # un reglage personnalise, propre a la photo precedente.
+        initial_key = self._selected_key if self._selected_key != CUSTOM_KEY else DEFAULT_PRESET
+        self._select(initial_key)
 
     def _select(self, key: str) -> None:
         if key not in self._versions:
@@ -208,10 +227,24 @@ class ReviewWidget(QWidget):
         for k, thumb in self._thumbs.items():
             thumb.set_selected(k == key)
 
+    def _open_custom_dialog(self) -> None:
+        if self._current_thumb is None:
+            return
+        dialog = CustomPresetDialog(self._current_thumb, initial=self._custom_params, parent=self)
+        if dialog.exec() != CustomPresetDialog.DialogCode.Accepted:
+            return
+        self._custom_params = dialog.params
+        result = apply_custom_preset(self._current_thumb, self._custom_params)
+        pixmap = _rgb_to_pixmap(result)
+        self._versions[CUSTOM_KEY] = pixmap
+        self._thumbs[CUSTOM_KEY].set_pixmap(pixmap)
+        self._select(CUSTOM_KEY)
+
     def _confirm(self) -> None:
         if self._current_path is None:
             return
-        self.choice_made.emit(str(self._current_path), self._selected_key)
+        value = self._custom_params if self._selected_key == CUSTOM_KEY else self._selected_key
+        self.choice_made.emit(str(self._current_path), value)
 
     def _delete(self) -> None:
         if self._current_path is None:

@@ -2,7 +2,9 @@ import unittest
 
 import numpy as np
 
-from divephoto.imaging.color import PRESETS, gray_world_balance, restore_red_channel
+from divephoto.imaging.color import (
+    PRESETS, CustomPresetParams, apply_custom_preset, gray_world_balance, restore_red_channel,
+)
 
 
 class ColorTest(unittest.TestCase):
@@ -41,6 +43,17 @@ class ColorTest(unittest.TestCase):
                 out = fn(self.rgb_uint8)
                 self.assertEqual(out.shape, self.rgb_uint8.shape)
                 self.assertEqual(out.dtype, np.uint8)
+
+    def test_apply_custom_preset_returns_valid_image(self) -> None:
+        params = CustomPresetParams(red_strength=1.2, gray_balance=0.6, contrast=2.0, sharpen=0.4, saturation=1.3)
+        out = apply_custom_preset(self.rgb_uint8, params)
+        self.assertEqual(out.shape, self.rgb_uint8.shape)
+        self.assertEqual(out.dtype, np.uint8)
+
+    def test_apply_custom_preset_with_zeroed_options_still_valid(self) -> None:
+        params = CustomPresetParams(contrast=0.0, sharpen=0.0)
+        out = apply_custom_preset(self.rgb_uint8, params)
+        self.assertEqual(out.shape, self.rgb_uint8.shape)
 
 
 if __name__ == "__main__":

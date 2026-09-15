@@ -6,8 +6,10 @@ from pathlib import Path
 
 from PySide6.QtCore import QThread, Signal
 
+from functools import partial
+
 from divephoto.export import export_photo, slugify
-from divephoto.imaging.color import PRESETS
+from divephoto.imaging.color import PRESETS, CustomPresetParams, apply_custom_preset
 from divephoto.imaging.loader import load_rgb
 from divephoto.inventory import unique_sorted_species, write_inventory_xlsx
 from divephoto.session import DiveSession
@@ -23,7 +25,7 @@ class ExportWorker(QThread):
         self,
         session: DiveSession,
         photos: list[Path],
-        choices: dict[str, str | None],
+        choices: dict[str, str | CustomPresetParams | None],
         species_tags: dict[str, list[SpeciesEntry]],
     ) -> None:
         super().__init__()
@@ -43,8 +45,11 @@ class ExportWorker(QThread):
         total = len(kept)
 
         for seq, path in enumerate(kept, start=1):
-            preset_key = self.choices[str(path)]
-            preset_fn = PRESETS.get(preset_key)  # None si "original"
+            preset_value = self.choices[str(path)]
+            if isinstance(preset_value, CustomPresetParams):
+                preset_fn = partial(apply_custom_preset, params=preset_value)
+            else:
+                preset_fn = PRESETS.get(preset_value)  # None si "original"
             tags = self.species_tags.get(str(path), [])
             species_names = [e.nom_vernaculaire for e in tags]
 
