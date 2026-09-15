@@ -1,0 +1,26 @@
+[project]
+name = "divephoto"
+version = "0.1.0"
+description = "Retouche colorimétrique, renommage en masse et tag d'espèces pour photos de plongée sous-marine"
+requires-python = ">=3.11"
+dependencies = [
+    "PySide6>=6.7",
+    "numpy>=1.26",
+    "opencv-python>=4.9",
+    "Pillow>=10.3",
+    "piexif>=1.1.3",
+    "rawpy>=0.21",
+]
+
+[project.scripts]
+divephoto = "divephoto.app:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+divephoto = ["data/*.csv"]
