@@ -1,10 +1,13 @@
 """Base d'espèces (faune/flore) pour le tag des photos de plongée.
 
-La base embarquée (`data/species.csv`) est volontairement modeste et
-éditable à la main : elle part d'un inventaire réel validé en plongée
-(Stage Montjoi) plutôt que d'un import automatique non vérifié, ce qui
-compte pour un usage d'identification sérieux. Elle est destinée à être
-complétée au fil des sessions.
+La base embarquée (`data/species.csv`, ~560 espèces) part d'un inventaire
+réel validé en plongée (Stage Montjoi) complété par les espèces les plus
+observées en Méditerranée et sur la façade Atlantique française (source :
+API iNaturalist, comptages d'observations par taxon), plutôt qu'un import
+brut de toute la biodiversité marine (qui compterait des dizaines de
+milliers de taxons microscopiques ou non identifiables en plongée). Le
+fichier reste un CSV éditable à la main, à corriger/compléter au fil des
+sessions.
 """
 from __future__ import annotations
 
@@ -87,9 +90,13 @@ class SpeciesCatalog:
         self.entries = entries if entries is not None else load_species()
 
     def for_region(self, region: str | None) -> list[SpeciesEntry]:
-        if not region or region == "les-deux":
+        """Filtre par region si la base couvre cette region, sinon renvoie
+        tout (la base ne couvre aujourd'hui que Mediterranee/Atlantique ;
+        mieux vaut proposer toute la base que rien pour les autres zones)."""
+        if not region:
             return list(self.entries)
-        return [e for e in self.entries if region in e.regions]
+        filtered = [e for e in self.entries if region in e.regions]
+        return filtered or list(self.entries)
 
     def search(self, query: str, region: str | None = None, limit: int = 30) -> list[SpeciesEntry]:
         candidates = self.for_region(region)

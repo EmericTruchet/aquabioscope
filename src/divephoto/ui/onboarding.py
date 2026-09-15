@@ -58,7 +58,7 @@ class OnboardingWidget(QWidget):
         for label, value in REGIONS:
             self.region_combo.addItem(label, value)
         self.photographer_edit = QLineEdit()
-        self.photographer_edit.setPlaceholderText("ex. Emeric Truchet")
+        self.photographer_edit.setPlaceholderText("ex. Jean Dupont")
         self.date_edit = QDateEdit(QDate.currentDate())
         self.date_edit.setCalendarPopup(True)
         self.date_edit.setDisplayFormat("dd/MM/yyyy")

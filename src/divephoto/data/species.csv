@@ -1,80 +1,563 @@
 embranchement,nom_vernaculaire,nom_scientifique,regions
+Végétaux,Acétabulaire,Acetabularia acetabulum,mediterranee
+Végétaux,Algue balai,Halopteris scoparia,mediterranee
+Végétaux,Algue ciliée,Calliblepharis ciliata,atlantique
+Végétaux,Algue duvet,Wrangelia penicillata,mediterranee
+Végétaux,Algue feuille de pierre encroûtante,Lithophyllum incrustans,"atlantique,mediterranee"
+Végétaux,Algue lombric,Furcellaria lumbricalis,atlantique
+Végétaux,Algue saucisson,Lomentaria articulata,atlantique
+Végétaux,Algue tube-de-cuir,Scytosiphon lomentaria,mediterranee
+Végétaux,Algue-velours rouge,Hildenbrandia rubra,atlantique
+Végétaux,Algues brunes filamenteuses,Acinetospora crinita,mediterranee
+Végétaux,Amphiroa rigide,Amphiroa rigida,mediterranee
+Végétaux,Asparagopsis if,Asparagopsis taxiformis,mediterranee
+Végétaux,Asparagopsis à crochets,Asparagopsis armata,"atlantique,mediterranee"
+Végétaux,Bifurcaire,Bifurcaria bifurcata,atlantique
+Végétaux,Béret basque,Codium bursa,"atlantique,mediterranee"
+Végétaux,Caulerpe cylindracée,Caulerpa cylindracea,mediterranee
+Végétaux,Cladophore des rochers,Cladophora rupestris,atlantique
+Végétaux,Cladostéphus spongieux,Cladostephus spongiosus,mediterranee
+Végétaux,Codium adhérent foncé,Codium adhaerens,atlantique
+Végétaux,Codium branchu cosmopolite,Codium tomentosum,atlantique
+Végétaux,codium fragile,Codium fragile,"atlantique,mediterranee"
+Végétaux,Codium mamelonné,Codium coralloides,mediterranee
+Végétaux,Codium vermiforme,Codium vermilara,mediterranee
+Végétaux,Codium étalé,Codium effusum,mediterranee
+Végétaux,Colpoménia sinueux,Colpomenia sinuosa,mediterranee
+Végétaux,Corallina berteroi,Corallina berteroi,mediterranee
+Végétaux,Coralline allongée,Ellisolandia elongata,mediterranee
+Végétaux,Coralline officinale,Corallina officinalis,"atlantique,mediterranee"
+Végétaux,Crinière flottante,Chaetomorpha linum,atlantique
+Végétaux,Cystoseire aplatie,Cystoseira compressa,mediterranee
+Végétaux,Cystoseire bleue,Ericaria selaginoides,atlantique
+Végétaux,Cystoseire stricte,Ericaria amentacea,mediterranee
+Végétaux,Dasyclade vermiforme,Dasycladus vermicularis,mediterranee
+Végétaux,Dictyota cyanoloma,Dictyota cyanoloma,mediterranee
+Végétaux,Dictyota implexa,Dictyota implexa,mediterranee
+Végétaux,Dictyote,Dictyota dichotoma,mediterranee
+Végétaux,Dictyote spatulée,Dictyota spiralis,mediterranee
+Végétaux,Dulse poivrée,Osmundea pinnatifida,atlantique
+Végétaux,Feuille de pierre encorbellée,Lithophyllum stictiforme,mediterranee
+Végétaux,Fougère de mer,Dictyopteris polypodioides,mediterranee
+Végétaux,Fucus denté,Fucus serratus,atlantique
+Végétaux,Fucus spiralé,Fucus spiralis,atlantique
+Végétaux,Fucus vésiculeux,Fucus vesiculosus,atlantique
+Végétaux,Gant de chirurgien,Chrysymenia ventricosa,mediterranee
+Végétaux,Gigartine,Mastocarpus stellatus,atlantique
+Végétaux,Goémon frisé,Chondrus crispus,atlantique
+Végétaux,Goémon noir,Ascophyllum nodosum,atlantique
+Végétaux,Goémon à vache,Palmaria palmata,atlantique
+Végétaux,Grand mésophylle,Mesophyllum expansum,mediterranee
+Végétaux,Grateloupe du Pacifique,Grateloupia turuturu,atlantique
+Végétaux,Haricot de mer,Himanthalia elongata,atlantique
+Végétaux,Laitue de mer,Ulva lactuca,"atlantique,mediterranee"
+Végétaux,Laminaire digitée,Laminaria digitata,atlantique
+Végétaux,Laminaire sucrée,Saccharina latissima,atlantique
+Végétaux,Laminaire à bulbe,Saccorhiza polyschides,atlantique
 Végétaux,Monnaie de Poséidon (algue verte calcaire),Halimeda tuna,mediterranee
+Végétaux,Padine queue de paon,Padina pavonica,atlantique
+Végétaux,Palmophylle,Palmophyllum crassum,mediterranee
+Végétaux,Pelvétie,Pelvetia canaliculata,atlantique
+Végétaux,Peyssonnelia rosa-marina,Peyssonnelia rosa-marina,mediterranee
+Végétaux,Peyssonnelia squamaria,Peyssonnelia squamaria,mediterranee
+Végétaux,Plocamium cartilagineux,Plocamium cartilagineum,atlantique
+Végétaux,Pompom des ascophylles,Vertebrata lanosa,atlantique
+Végétaux,Rugulopteryx d'Okamura,Rugulopteryx okamurae,mediterranee
+Végétaux,Sargasse japonaise,Sargassum muticum,atlantique
+Végétaux,Sphérocoque,Sphaerococcus coronopifolius,"atlantique,mediterranee"
+Végétaux,Tricléocarpe fragile,Tricleocarpa fragilis,mediterranee
+Végétaux,Udotée,Flabellia petiolata,mediterranee
+Végétaux,Ulve rigide,Ulva rigida,"atlantique,mediterranee"
+Végétaux,Ulve tubuleuse,Ulva intestinalis,"atlantique,mediterranee"
+Végétaux,Valonie tubuleuse,Valonia utricularis,mediterranee
+Végétaux,Voleuse d'huîtres,Colpomenia peregrina,atlantique
+Végétaux,Wakamé,Undaria pinnatifida,atlantique
+Végétaux,Zanardinia,Zanardinia typus,mediterranee
+Végétaux,Zonée jaune,Zonaria tournefortii,mediterranee
+Eponge,Agélas orangée,Agelas oroides,mediterranee
+Eponge,Aplysille jaune soufre,Aplysilla sulfurea,atlantique
+Eponge,Aplysille rose,Aplysilla rosea,atlantique
+Eponge,Axinelle commune,Axinella polypoides,mediterranee
+Eponge,Axinelle plate,Axinella damicornis,mediterranee
 Eponge,Axinelle verruqueuse,Axinella verrucosa,mediterranee
+Eponge,Axinelle étoilée,Axinella dissimilis,atlantique
+Eponge,Chaline cendrée,Haliclona cinerea,atlantique
+Eponge,Clathrine jaune,Clathrina clathrus,mediterranee
+Eponge,Clione jaune,Cliona celata,"atlantique,mediterranee"
+Eponge,Clione verte,Cliona viridis,mediterranee
+Eponge,Eponge encroûtante bleuâtre,Phorbas tenacior,mediterranee
+Eponge,Eponge petit œuf,Sycon ciliatum,atlantique
+Eponge,Eponge pierre,Petrosia ficiformis,mediterranee
+Eponge,Eponge tubes de fer,Haliclona simulans,atlantique
+Eponge,Eponge à cratères,Hemimycale columella,"atlantique,mediterranee"
+Eponge,Eponge-rognon,Chondrosia reniformis,mediterranee
+Eponge,Fesse d'éléphant,Pachymatisma johnstonia,atlantique
+Eponge,Ircinie fibreuse,Sarcotragus fasciculatus,mediterranee
+Eponge,Ircinie noire épineuse,Sarcotragus spinosulus,mediterranee
+Eponge,Ircinie sombre,Ircinia oros,mediterranee
+Eponge,Ircinie variable,Ircinia variabilis,mediterranee
+Eponge,Orange de mer de Manche Atlantique,Tethya citrina,atlantique
+Eponge,Oscarella nicolae,Oscarella nicolae,atlantique
 Eponge,Oscarelle,Oscarella lobularis,mediterranee
+Eponge,Subérite-figue,Suberites ficus,atlantique
+Eponge,Éponge cheminée rose,Dysidea avara,mediterranee
 Eponge,Éponge cornée noire,Sarcotragus foetidus,mediterranee
+Eponge,Éponge encroûtante bleue,Terpios gelatinosus,atlantique
+Eponge,Éponge encroûtante orange-rouge,Crambe crambe,mediterranee
+Eponge,Éponge mie de pain,Halichondria panicea,atlantique
+Eponge,Éponge mie de pain mouillée,Dysidea fragilis,"atlantique,mediterranee"
+Eponge,Éponge mousse de carotte,Amphilectus fucorum,atlantique
+Eponge,Éponge orange encroûtante,Hymeniacidon perlevis,"atlantique,mediterranee"
+Eponge,Éponge petite bourse aplatie,Grantia compressa,atlantique
+Eponge,Éponge rameaux de chocolat,Raspailia ramosa,atlantique
 Eponge,Éponge verongia (aplysine),Aplysina aerophoba,mediterranee
-Cnidaire,Anémone verte,Anemonia viridis,mediterranee
+Eponge,Éponge à languettes,Polymastia penicillus,atlantique
+Cnidaire,Actinie de Méditerranée,Actinia mediterranea,mediterranee
+Cnidaire,Actinie rouge,Actinia equina,atlantique
+Cnidaire,Actinie striée,Actinia striata,mediterranee
+Cnidaire,Aiptasie de Couch,Aiptasia couchii,"atlantique,mediterranee"
+Cnidaire,Aiptasie verte,Aiptasia mutabilis,mediterranee
+Cnidaire,Alcyon brun,Maasella edwardsi,mediterranee
+Cnidaire,Alcyon encroûtant,Alcyonium coralloides,mediterranee
+Cnidaire,Alcyon jaune,Alcyonium digitatum,atlantique
+Cnidaire,Alcyon méditerranéen,Alcyonium acaule,mediterranee
+Cnidaire,Alcyon rouge,Alcyonium glomeratum,atlantique
+Cnidaire,Alicia,Alicia mirabilis,mediterranee
+Cnidaire,Andrésie,Andresia partenopea,atlantique
+Cnidaire,Anémone asiatique lignée,Diadumene lineata,atlantique
+Cnidaire,Anémone bijou,Corynactis viridis,"atlantique,mediterranee"
+Cnidaire,Anémone charnue,Cribrinopsis crassa,mediterranee
+Cnidaire,Anémone des Posidonies,Paranemonia cinerea,mediterranee
+Cnidaire,Anémone encroûtante beige,Epizoanthus arenaceus,mediterranee
+Cnidaire,Anémone encroûtante brune,Epizoanthus couchii,atlantique
+Cnidaire,Anémone fraise,Actinia fragacea,atlantique
+Cnidaire,Anémone gemme,Bunodactis verrucosa,"atlantique,mediterranee"
+Cnidaire,Anémone impériale,Capnea sanguinea,atlantique
+Cnidaire,Anémone marguerite,Actinothoe sphyrodeta,atlantique
+Cnidaire,Anémone parasite,Calliactis parasitica,"atlantique,mediterranee"
+Cnidaire,Anémone plumeuse,Metridium senile,atlantique
+Cnidaire,Anémone rougeâtre nocturne,Telmatactis forskalii,mediterranee
+Cnidaire,Anémone solaire,Cereus pedunculatus,"atlantique,mediterranee"
+Cnidaire,Anémone verte,Anemonia viridis,"atlantique,mediterranee"
+Cnidaire,Anémone à points rouges,Anthopleura ballii,atlantique
+Cnidaire,Aurélie,Aurelia aurita,atlantique
+Cnidaire,Candelabrum cocksii,Candelabrum cocksii,atlantique
 Cnidaire,Cladocore en touffe,Cladocora caespitosa,mediterranee
+Cnidaire,Clavulaire commune,Clavularia crassa,mediterranee
+Cnidaire,Corail rouge de Méditerranée,Corallium rubrum,mediterranee
+Cnidaire,Corail solitaire jaune,Leptopsammia pruvoti,"atlantique,mediterranee"
+Cnidaire,Cyanée de Lamarck,Cyanea lamarckii,atlantique
+Cnidaire,Cérianthe solitaire,Pachycerianthus solitarius,mediterranee
+Cnidaire,Dahlia de mer,Urticina felina,atlantique
+Cnidaire,Dent de chien,Caryophyllia smithii,atlantique
 Cnidaire,Dent de cochon (madréporaire solitaire),Balanophyllia europaea,mediterranee
 Cnidaire,Gorgone blanche,Eunicella singularis,mediterranee
+Cnidaire,Gorgone jaune,Eunicella cavolini,mediterranee
+Cnidaire,Gorgone orange,Leptogorgia sarmentosa,mediterranee
+Cnidaire,Gorgone pourpre,Paramuricea clavata,mediterranee
+Cnidaire,Gorgone verruqueuse,Eunicella verrucosa,atlantique
+Cnidaire,Grand Cérianthe,Cerianthus membranaceus,"atlantique,mediterranee"
+Cnidaire,Halcampoïde,Halcampoides purpureus,mediterranee
 Cnidaire,Hydraire,Hydrozoa (indéterminé),mediterranee
+Cnidaire,Hydraire des amarres,Pennaria disticha,mediterranee
+Cnidaire,Hydraire-antenne,Nemertesia antennina,atlantique
+Cnidaire,Lucernaire campanulée,Calvadosia campanulata,atlantique
+Cnidaire,Madrépore bouton d'or,Balanophyllia regia,"atlantique,mediterranee"
+Cnidaire,Madrépore encroûtant,Oculina patagonica,mediterranee
+Cnidaire,Madrépore œillet,Caryophyllia inornata,"atlantique,mediterranee"
+Cnidaire,Méduse rayonnée,Chrysaora hysoscella,atlantique
+Cnidaire,Obélie géniculée,Obelia geniculata,atlantique
 Cnidaire,Parazoanthus (anémone encroûtante jaune),Parazoanthus axinellae,mediterranee
+Cnidaire,Parazoanthus brevitentacularis,Parazoanthus brevitentacularis,mediterranee
+Cnidaire,Petit cérianthe,Synarachnactis lloydii,atlantique
+Cnidaire,Petite dynamène,Dynamena pumila,atlantique
+Cnidaire,Physalie,Physalia physalis,atlantique
+Cnidaire,Plume élégante,Virgularia mirabilis,mediterranee
+Cnidaire,Pélagie,Pelagia noctiluca,"atlantique,mediterranee"
+Cnidaire,Rhizostome atlantique,Rhizostoma octopus,atlantique
+Cnidaire,Rhizostome de Méditerranée,Rhizostoma pulmo,mediterranee
+Cnidaire,Sagartie des vases,Cylista troglodytes,atlantique
+Cnidaire,Sagartie élégante,Cylista elegans,atlantique
+Cnidaire,Vélelle,Velella velella,"atlantique,mediterranee"
+Cnidaire,Vérétille verge de chien,Veretillum cynomorium,mediterranee
+Cnidaire,Équorée,Aequorea forskalea,atlantique
 Cnidaire,Œuf sur le plat (méduse),Cotylorhiza tuberculata,mediterranee
-Ver,Serpule,Serpula vermicularis,mediterranee
+Cténophore,Béroé,Beroe ovata,"atlantique,mediterranee"
+Cténophore,Béroé de Forskal,Beroe forskalii,mediterranee
+Cténophore,Callianira à deux ailes,Callianira bialata,mediterranee
+Cténophore,Ceinture de Vénus,Cestum veneris,mediterranee
+Cténophore,Deiopea kaloktenota,Deiopea kaloktenota,mediterranee
+Cténophore,Groseille de mer,Pleurobrachia pileus,"atlantique,mediterranee"
+Cténophore,Groseille-de-mer lobée,Bolinopsis infundibulum,atlantique
+Cténophore,Groseille-de-mer rosée,Beroe cucumis,atlantique
+Cténophore,Haeckelia rubra,Haeckelia rubra,mediterranee
+Cténophore,Lampea pancerina,Lampea pancerina,mediterranee
+Cténophore,Leucothéa,Leucothea multicornis,"atlantique,mediterranee"
+Cténophore,Mnémiopsis,Mnemiopsis leidyi,"atlantique,mediterranee"
+Ver,Acromegalomma lanigerum,Acromegalomma lanigerum,mediterranee
+Ver,Annélide gélatineux,Alentia gelatinosa,atlantique
+Ver,Arénicole,Arenicola marina,atlantique
+Ver,Bispira mariae,Bispira mariae,mediterranee
+Ver,Bispira viola,Bispira viola,mediterranee
+Ver,Bispire,Bispira volutacornis,atlantique
+Ver,Bonellie verte,Bonellia viridis,mediterranee
+Ver,Branchiomma moebii,Branchiomma moebii,mediterranee
+Ver,Cascail,Ficopomatus enigmaticus,mediterranee
+Ver,Eulalie,Eulalia clavigera,atlantique
+Ver,Euphrosine foliosa,Euphrosine foliosa,atlantique
+Ver,Filograna tricoté,Filograna implexa,mediterranee
+Ver,Gravette,Hediste diversicolor,atlantique
+Ver,Harmothoe areolata,Harmothoe areolata,mediterranee
+Ver,Harmothoe extenuata,Harmothoe extenuata,atlantique
+Ver,Hermelle,Sabellaria alveolata,atlantique
+Ver,Hypsicomus stichophthalmos,Hypsicomus stichophthalmos,mediterranee
+Ver,Mégalomma,Acromegalomma vesiculosum,atlantique
+Ver,Petit palmier,Lanice conchilega,"atlantique,mediterranee"
+Ver,Protule lisse,Protula tubularia,mediterranee
+Ver,Protule rouge,Protula intestinum,mediterranee
+Ver,Sabelle de vase,Myxicola infundibulum,"atlantique,mediterranee"
+Ver,Sangsue noire,Haemopis sanguisuga,"atlantique,mediterranee"
+Ver,Serpule,Serpula vermicularis,"atlantique,mediterranee"
+Ver,Serpule triangulaire,Spirobranchus triqueter,"atlantique,mediterranee"
+Ver,Serpule triangulaire,Spirobranchus lamarcki,atlantique
+Ver,Spirographe,Sabella pavonina,"atlantique,mediterranee"
+Ver,Spirographe,Sabella spallanzanii,"atlantique,mediterranee"
+Ver,Spirorbe,Spirorbis spirorbis,atlantique
+Ver,Ver rouge à collier,Leodice torquata,mediterranee
+Ver,Ver à quinze écailles,Harmothoe imbricata,atlantique
+Mollusque,Anomie pelure d'oignon,Anomia ephippium,"atlantique,mediterranee"
+Mollusque,Arche de Noé,Arca noae,mediterranee
+Mollusque,Astrée rugueuse,Bolma rugosa,mediterranee
+Mollusque,Berthelle plume,Berthella plumula,atlantique
+Mollusque,Bigorneau,Littorina littorea,atlantique
+Mollusque,Bouche de sang,Stramonita haemastoma,mediterranee
+Mollusque,Bucarde tuberculée,Acanthocardia tuberculata,mediterranee
+Mollusque,Buccin commun,Buccinum undatum,atlantique
 Mollusque,Béret basque / Ombrelle de Méditerranée,Umbraculum umbraculum,mediterranee
+Mollusque,Calliostome,Calliostoma zizyphinum,atlantique
+Mollusque,Chiton cendré,Lepidochitona cinerea,atlantique
+Mollusque,Chiton vert,Rhyssoplax olivacea,mediterranee
+Mollusque,Colombelle rustique,Columbella rustica,mediterranee
+Mollusque,Coque commune,Cerastoderma edule,atlantique
+Mollusque,Coque glauque,Cerastoderma glaucum,mediterranee
+Mollusque,Coquille Saint-Jacques de l'Atlantique,Pecten maximus,atlantique
+Mollusque,Cormaillot,Ocenebra erinaceus,atlantique
+Mollusque,Coryphelle mauve,Edmundsella pedata,"atlantique,mediterranee"
+Mollusque,Crépidule,Crepidula fornicata,atlantique
+Mollusque,Cérithe goumier,Thericium vulgatum,mediterranee
 Mollusque,Doris dalmatien (vache de mer),Peltodoris atromaculata,mediterranee
+Mollusque,Doris de Fontandrau,Felimare fontandraui,mediterranee
+Mollusque,Doris géant,Felimare picta,mediterranee
+Mollusque,Doris tricolore,Felimare tricolor,mediterranee
+Mollusque,Doris verruqueuse,Doris verrucosa,atlantique
+Mollusque,Doris à papilles rouges,Diaphorodoris papillata,mediterranee
+Mollusque,Elysie timide,Elysia timida,mediterranee
+Mollusque,Elysie verte,Elysia viridis,atlantique
+Mollusque,Faceline bleutée,Facelina auriculata,atlantique
+Mollusque,Flabelline d'Ischia,Paraflabellina ischitana,mediterranee
+Mollusque,Flabelline mauve,Flabellina affinis,mediterranee
+Mollusque,Flion tronqué,Donax trunculus,mediterranee
+Mollusque,Gibbule cendrée,Steromphala cineraria,atlantique
+Mollusque,Gibbule commune,Phorcus turbinatus,mediterranee
+Mollusque,Gibbule mage,Gibbula magus,atlantique
+Mollusque,Grain de café à trois points,Trivia monacha,atlantique
+Mollusque,Grande nacre,Pinna nobilis,mediterranee
+Mollusque,Helcion,Patella pellucida,atlantique
+Mollusque,Hervia pèlerine,Cratena peregrina,mediterranee
+Mollusque,Huître creuse du Pacifique,Magallana gigas,atlantique
+Mollusque,Huître plate,Ostrea edulis,atlantique
+Mollusque,Jorunna blanche,Jorunna tomentosa,atlantique
+Mollusque,Limacia digitée,Limacia clavigera,atlantique
+Mollusque,Littorine des rochers,Littorina saxatilis,atlantique
+Mollusque,Littorine obtuse,Littorina obtusata,atlantique
+Mollusque,Lièvre de mer moucheté,Aplysia punctata,atlantique
+Mollusque,Lièvre noir de mer,Aplysia fasciata,mediterranee
+Mollusque,Mactre coralline,Mactra stultorum,mediterranee
+Mollusque,Monodonte,Phorcus lineatus,atlantique
+Mollusque,Moule commune,Mytilus edulis,atlantique
+Mollusque,Moule de Méditerranée,Mytilus galloprovincialis,mediterranee
 Mollusque,Nacre épineuse,Pinna rudis,mediterranee
+Mollusque,Nasse réticulée,Tritia reticulata,atlantique
+Mollusque,Natice hébraïque,Naticarius hebraeus,mediterranee
+Mollusque,Ormeau européen,Haliotis tuberculata,"atlantique,mediterranee"
+Mollusque,Patelle bleue,Patella caerulea,mediterranee
+Mollusque,Patelle commune,Patella vulgata,atlantique
 Mollusque,Petit gastéropode,Gastropoda (indéterminé),mediterranee
+Mollusque,Petite praire,Chamelea gallina,mediterranee
+Mollusque,Polycère à quatre lignes,Polycera quadrilineata,atlantique
 Mollusque,Ponte de nudibranche,Nudibranchia (ponte),mediterranee
+Mollusque,Poulpe commun,Octopus vulgaris,"atlantique,mediterranee"
+Mollusque,Pourpre petite pierre,Nucella lapillus,atlantique
+Mollusque,Pétoncle noir,Mimachlamys varia,atlantique
+Mollusque,Rocher fascié,Hexaplex trunculus,mediterranee
+Mollusque,Seiche commune,Sepia officinalis,"atlantique,mediterranee"
+Mollusque,Thuridille de Hope,Thuridilla hopei,mediterranee
+Mollusque,Troque ombiliqué,Steromphala umbilicalis,atlantique
 Mollusque,Tylodina (limace jaune de la verongia),Tylodina perversa,mediterranee
+Mollusque,Élégante striée,Pomatias elegans,mediterranee
+Bryozoaire,Bryozoaire encroûtant noir,Reptadeonella violacea,mediterranee
+Bryozoaire,Bryozoaire encroûtant rouge,Schizobrachiella sanguinea,mediterranee
+Bryozoaire,Bryozoaire orange vif et noir à points noirs,Watersipora subatra,atlantique
+Bryozoaire,Bugule,Bugula sp.,"atlantique,mediterranee"
+Bryozoaire,Cryptosule cloche,Cryptosula pallasiana,atlantique
+Bryozoaire,Dentelle de Neptune,Retepora cellulosa,mediterranee
+Bryozoaire,Dentelle de Neptune,Reteporella grimaldii,mediterranee
+Bryozoaire,Faux corail,Myriapora truncata,mediterranee
+Bryozoaire,Grand bryozoaire hirsute,Flustrellidra hispida,atlantique
+Bryozoaire,Grande flustre,Flustra foliacea,atlantique
+Bryozoaire,Membranipore,Membranipora membranacea,atlantique
+Bryozoaire,Parasmittine de Rouville,Parasmittina rouvillei,mediterranee
+Bryozoaire,Rose de mer,Pentapora fascialis,mediterranee
+Bryozoaire,Rose de mer,Pentapora foliacea,atlantique
+Bryozoaire,Schizomavelle mamelonné,Schizomavella mamillata,mediterranee
+Bryozoaire,Schizoporella brun,Schizoporella errata,mediterranee
+Bryozoaire,Schizoporella unicorne,Schizoporella unicornis,atlantique
+Bryozoaire,Écorce pileuse,Electra pilosa,atlantique
 Arthropode,Anatife,Lepas anatifera,mediterranee
+Arthropode,Araignée commune,Maja crispata,mediterranee
+Arthropode,Araignée de mer,Maja brachydactyla,atlantique
+Arthropode,Araignée de mer ridée,Herbstia condyliata,mediterranee
+Arthropode,Araignée des anémones,Inachus phalangium,"atlantique,mediterranee"
+Arthropode,Arcitalitrus dorrieni,Arcitalitrus dorrieni,atlantique
+Arthropode,Bernard l'ermite commun,Pagurus bernhardus,atlantique
+Arthropode,Crabe bleu,Callinectes sapidus,mediterranee
+Arthropode,Crabe de pierre,Xantho hydrophilus,atlantique
+Arthropode,Crabe marbré,Pachygrapsus marmoratus,"atlantique,mediterranee"
+Arthropode,Crabe masqué,Corystes cassivelaunus,atlantique
+Arthropode,Crabe plat des oursins,Percnon gibbesi,mediterranee
+Arthropode,crabe poilu rouge,Pilumnus hirtellus,atlantique
+Arthropode,Crabe porcelaine à longues pinces,Pisidia longicornis,atlantique
+Arthropode,Crabe verruqueux,Eriphia verrucosa,"atlantique,mediterranee"
+Arthropode,Crabe vert,Carcinus maenas,atlantique
+Arthropode,Crabe vert de Méditerranée,Carcinus aestuarii,mediterranee
+Arthropode,Crevette caramote,Penaeus kerathurus,mediterranee
+Arthropode,Crevette cavernicole jaune,Stenopus spinosus,mediterranee
+Arthropode,Crevette drimo,Gnathophyllum elegans,mediterranee
+Arthropode,Crevette nettoyeuse rouge,Lysmata seticaudata,mediterranee
+Arthropode,Crevette à capuchon,Athanas nitescens,atlantique
+Arthropode,Crevette-autruche comestible,Processa edulis,mediterranee
+Arthropode,Dromie,Dromia personata,mediterranee
 Arthropode,Galathée,Galathea strigosa,mediterranee
+Arthropode,Galathée noire,Galathea squamifera,"atlantique,mediterranee"
+Arthropode,Grand pagure rouge,Dardanus calidus,mediterranee
+Arthropode,Grande crevette rose,Palaemon serratus,"atlantique,mediterranee"
+Arthropode,Hippolyte commune,Hippolyte varians,atlantique
+Arthropode,Homard européen,Homarus gammarus,atlantique
+Arthropode,Idotée de la Baltique,Idotea balthica,atlantique
+Arthropode,Langouste rouge,Palinurus elephas,"atlantique,mediterranee"
+Arthropode,Pagure anachorète,Pagurus anachoretus,mediterranee
+Arthropode,Pagure de Prideaux,Pagurus prideaux,mediterranee
+Arthropode,Pagure des rochers,Clibanarius erythropus,"atlantique,mediterranee"
+Arthropode,Pagure des sables,Diogenes pugilator,"atlantique,mediterranee"
+Arthropode,Pagure poilu,Pagurus cuanensis,mediterranee
+Arthropode,Pagure sédentaire,Calcinus tubularis,mediterranee
+Arthropode,Petite cigale de mer,Scyllarus arctus,mediterranee
+Arthropode,Petite crevette rose,Palaemon elegans,"atlantique,mediterranee"
+Arthropode,Pise à quatre dents,Pisa tetraodon,atlantique
+Arthropode,Porcellane grise,Porcellana platycheles,atlantique
+Arthropode,Péricliménès atlantique,Periclimenes sagittifer,atlantique
+Arthropode,Sphaeroma serratum,Sphaeroma serratum,atlantique
+Arthropode,Talitre sauteur,Talitrus saltator,atlantique
+Arthropode,Tourteau,Cancer pagurus,atlantique
+Arthropode,Xanthe de Méditerranée,Xantho poressa,mediterranee
+Arthropode,Xanthe poilu,Xantho pilipes,atlantique
+Arthropode,Écrevisse de Louisiane,Procambarus clarkii,"atlantique,mediterranee"
+Arthropode,Écrevisse signal,Pacifastacus leniusculus,mediterranee
+Arthropode,Étrille,Necora puber,atlantique
+Echinoderme,Astérie bossue,Asterina gibbosa,"atlantique,mediterranee"
+Echinoderme,Comatule commune,Antedon bifida,atlantique
+Echinoderme,Comatule de méditerranée,Antedon mediterranea,mediterranee
+Echinoderme,Etoile de mer lisse,Hacelia attenuata,mediterranee
+Echinoderme,Etoile de mer épineuse,Coscinasterias tenuispina,mediterranee
+Echinoderme,Etoile-peigne commune,Astropecten irregularis,mediterranee
+Echinoderme,Etoile-peigne à piquants plats,Astropecten platyacanthus,mediterranee
+Echinoderme,Gorgonocéphale,Astrospartus mediterraneus,mediterranee
+Echinoderme,Grand lèche-doigts blanc,Pawsonia saxicola,atlantique
 Echinoderme,Holothurie (concombre de mer),Holothuria tubulosa,mediterranee
-Echinoderme,Ophiure,Ophiothrix fragilis,mediterranee
-Echinoderme,Étoile de mer rouge,Echinaster sepositus,mediterranee
+Echinoderme,Holothurie auréolée,Holothuria sanctori,mediterranee
+Echinoderme,Holothurie noire,Holothuria forskali,"atlantique,mediterranee"
+Echinoderme,Holothurie à points blancs,Holothuria poli,mediterranee
+Echinoderme,Lèche-doigts de Lefèvre,Aslia lefevrei,atlantique
+Echinoderme,Ophiure,Ophiothrix fragilis,"atlantique,mediterranee"
+Echinoderme,Ophiure blanche,Ophiura albida,atlantique
+Echinoderme,Ophiure commune,Ophiura ophiura,atlantique
+Echinoderme,Ophiure lisse,Ophioderma longicaudum,mediterranee
+Echinoderme,Ophiure noire,Ophiocomina nigra,atlantique
+Echinoderme,Ophiure écailleuse,Amphipholis squamata,atlantique
+Echinoderme,Oursin commun,Paracentrotus lividus,"atlantique,mediterranee"
+Echinoderme,Oursin globuleux,Echinus esculentus,atlantique
+Echinoderme,Oursin granuleux,Sphaerechinus granularis,"atlantique,mediterranee"
+Echinoderme,Oursin noir,Arbacia lixula,mediterranee
+Echinoderme,Oursin vert,Psammechinus miliaris,atlantique
+Echinoderme,Oursin-cœur,Echinocardium cordatum,atlantique
+Echinoderme,Oursin-diadème méditerranéen,Centrostephanus longispinus,mediterranee
+Echinoderme,Petite astérie naine,Asterina phylactica,atlantique
+Echinoderme,Petite étoile-peigne,Astropecten spinulosus,mediterranee
+Echinoderme,Étoile de mer commune,Asterias rubens,atlantique
+Echinoderme,Étoile de mer glaciaire,Marthasterias glacialis,"atlantique,mediterranee"
+Echinoderme,Étoile de mer rouge,Echinaster sepositus,"atlantique,mediterranee"
+Echinoderme,Étoile à sept bras,Luidia ciliaris,atlantique
+Urochordé,Aplidium de Nordmann,Aplidium nordmanni,mediterranee
+Urochordé,Aplidium glabre,Aplidium glabrum,atlantique
+Urochordé,Ascidie blanche,Phallusia mammillata,"atlantique,mediterranee"
+Urochordé,Ascidie cartilagineuse,Corella eumyota,atlantique
+Urochordé,Ascidie coloniale pourpre,Cystodytes dellechiajei,mediterranee
+Urochordé,Ascidie groseille,Dendrodoa grossularia,atlantique
+Urochordé,Ascidie japonaise,Styela clava,atlantique
+Urochordé,Ascidie noire,Phallusia fumigata,mediterranee
+Urochordé,Ascidie plissée,Styela plicata,mediterranee
+Urochordé,Ascidie rose,Ascidia mentula,atlantique
 Urochordé,Ascidie rouge,Halocynthia papillosa,mediterranee
-Urochordé,Claveline,Clavelina lepadiformis,mediterranee
+Urochordé,Botrylle cristallin,Botrylloides crystallinus,mediterranee
+Urochordé,Botrylle de Leach,Botrylloides leachii,atlantique
+Urochordé,Botrylle de San Diego,Botrylloides diegensis,atlantique
+Urochordé,Botrylle violet,Botrylloides violaceus,atlantique
+Urochordé,Botrylle étoilé,Botryllus schlosseri,"atlantique,mediterranee"
+Urochordé,Cione intestinale,Ciona intestinalis,atlantique
+Urochordé,Claveline,Clavelina lepadiformis,"atlantique,mediterranee"
+Urochordé,Claveline naine commune,Pycnoclavella communis,mediterranee
+Urochordé,Didemne lisse perforé,Lissoclinum perforatum,mediterranee
+Urochordé,Didemne spongieux,Diplosoma spongiforme,mediterranee
+Urochordé,Didemne variable,Didemnum maculosum,atlantique
+Urochordé,Flocon pédonculé rouge,Morchellium argus,atlantique
+Urochordé,Fraise de mer,Aplidium elegans,"atlantique,mediterranee"
+Urochordé,Synascidie de Lacaze,Polysyncraton lacazei,mediterranee
+Urochordé,Violet à bouche rose,Pyura dura,mediterranee
+Poissons osseux,Anguille d'Europe,Anguilla anguilla,atlantique
 Poissons osseux,Anthias,Anthias anthias,mediterranee
+Poissons osseux,Apogon commun,Apogon imberbis,mediterranee
 Poissons osseux,Badèche,Epinephelus costae,mediterranee
+Poissons osseux,Baliste commun,Balistes capriscus,atlantique
+Poissons osseux,Bar européen,Dicentrarchus labrax,"atlantique,mediterranee"
 Poissons osseux,Barracuda / Bécune,Sphyraena sphyraena,mediterranee
+Poissons osseux,Blennie coiffée,Coryphoblennius galerita,atlantique
 Poissons osseux,Blennie de Roux,Parablennius rouxi,mediterranee
 Poissons osseux,Blennie de Zvonimir,Parablennius zvonimiri,mediterranee
-Poissons osseux,Blennie gattorugine,Parablennius gattorugine,mediterranee
-Poissons osseux,Blennie pilicorne,Parablennius pilicornis,mediterranee
+Poissons osseux,Blennie diabolo,Parablennius incognitus,mediterranee
+Poissons osseux,Blennie gattorugine,Parablennius gattorugine,"atlantique,mediterranee"
+Poissons osseux,Blennie palmicorne,Parablennius sanguinolentus,"atlantique,mediterranee"
+Poissons osseux,Blennie paon,Salaria pavo,"atlantique,mediterranee"
+Poissons osseux,Blennie pilicorne,Parablennius pilicornis,"atlantique,mediterranee"
+Poissons osseux,Blennie sphinx,Aidablennius sphynx,mediterranee
+Poissons osseux,Bogue,Boops boops,mediterranee
+Poissons osseux,Bécune à bouche jaune,Sphyraena viridensis,mediterranee
+Poissons osseux,Carpe commune,Cyprinus carpio,"atlantique,mediterranee"
 Poissons osseux,Castagnole,Chromis chromis,mediterranee
+Poissons osseux,Chabot-buffle,Taurulus bubalis,atlantique
+Poissons osseux,Chevesne commun,Squalius cephalus,atlantique
+Poissons osseux,Chinchard commun,Trachurus trachurus,"atlantique,mediterranee"
+Poissons osseux,Congre,Conger conger,"atlantique,mediterranee"
+Poissons osseux,Coquette,Labrus mixtus,atlantique
+Poissons osseux,Corb,Sciaena umbra,mediterranee
+Poissons osseux,Crénilabre de Baillon,Symphodus bailloni,atlantique
+Poissons osseux,Crénilabre méditerranéen,Symphodus mediterraneus,mediterranee
+Poissons osseux,Crénilabre mélops,Symphodus melops,atlantique
+Poissons osseux,Crénilabre ocellé,Symphodus ocellatus,mediterranee
+Poissons osseux,Crénilabre paon,Symphodus tinca,mediterranee
+Poissons osseux,Crénilabre à cinq taches,Symphodus roissali,mediterranee
+Poissons osseux,Cténolabre rupestre,Ctenolabrus rupestris,atlantique
+Poissons osseux,Denté commun,Dentex dentex,mediterranee
+Poissons osseux,Dorade grise,Spondyliosoma cantharus,"atlantique,mediterranee"
+Poissons osseux,Dorade royale,Sparus aurata,mediterranee
+Poissons osseux,Dragonnet lyre,Callionymus lyra,atlantique
+Poissons osseux,Flet d'Europe,Platichthys flesus,atlantique
+Poissons osseux,Gardon commun,Rutilus rutilus,atlantique
+Poissons osseux,Girelle commune,Coris julis,mediterranee
 Poissons osseux,Girelle paon,Thalassoma pavo,mediterranee
+Poissons osseux,Gobie des sables,Pomatoschistus minutus,atlantique
+Poissons osseux,Gobie léopard,Thorogobius ephippiatus,atlantique
+Poissons osseux,Gobie marbré,Pomatoschistus marmoratus,mediterranee
+Poissons osseux,Gobie moucheté mystère,Gobius incognitus,mediterranee
+Poissons osseux,Gobie nageur,Pomatoschistus flavescens,atlantique
+Poissons osseux,Gobie nain de Guillet,Lebetus guilleti,atlantique
+Poissons osseux,Gobie noir,Gobius niger,"atlantique,mediterranee"
+Poissons osseux,Gobie paganel,Gobius paganellus,"atlantique,mediterranee"
+Poissons osseux,Gobie tacheté,Pomatoschistus microps,atlantique
+Poissons osseux,Gobie varié,Pomatoschistus pictus,atlantique
+Poissons osseux,Gobie à bouche rouge,Gobius cruentatus,mediterranee
+Poissons osseux,Gobie à grosse tête,Gobius cobitis,"atlantique,mediterranee"
+Poissons osseux,Gobie à joues poreuses,Gobius geniporus,mediterranee
+Poissons osseux,Gobie à tête jaune,Gobius xanthocephalus,mediterranee
+Poissons osseux,Grand brochet,Esox lucius,atlantique
+Poissons osseux,Grande rascasse rouge,Scorpaena scrofa,mediterranee
+Poissons osseux,Grondin perlon,Chelidonichthys lucerna,atlantique
+Poissons osseux,Hippocampe moucheté,Hippocampus guttulatus,mediterranee
+Poissons osseux,Hippocampe à museau court,Hippocampus hippocampus,"atlantique,mediterranee"
+Poissons osseux,Joël,Atherina boyeri,mediterranee
 Poissons osseux,Labre merle,Labrus merula,mediterranee
-Poissons osseux,Mulet lippu,Chelon labrosus,mediterranee
+Poissons osseux,Lançon équille,Ammodytes tobianus,atlantique
+Poissons osseux,Lieu jaune,Pollachius pollachius,atlantique
+Poissons osseux,Marbré,Lithognathus mormyrus,mediterranee
+Poissons osseux,Mordocet,Lipophrys pholis,atlantique
+Poissons osseux,Mostelle de roche,Phycis phycis,mediterranee
+Poissons osseux,Motelle à cinq barbillons,Ciliata mustela,atlantique
+Poissons osseux,Motelle à trois barbillons,Gaidropsarus mediterraneus,atlantique
+Poissons osseux,Mulet lippu,Chelon labrosus,"atlantique,mediterranee"
+Poissons osseux,Mulet à grosse tête,Mugil cephalus,atlantique
 Poissons osseux,Murène (murène de Méditerranée),Muraena helena,mediterranee
 Poissons osseux,Mérou brun,Epinephelus marginatus,mediterranee
+Poissons osseux,Nérophis lombricoïde,Nerophis lumbriciformis,atlantique
+Poissons osseux,Oblade,Oblada melanurus,mediterranee
+Poissons osseux,Perche commune,Perca fluviatilis,atlantique
+Poissons osseux,Perche soleil,Lepomis gibbosus,atlantique
+Poissons osseux,Petite rascasse rouge,Scorpaena notata,mediterranee
+Poissons osseux,Poisson rouge,Carassius auratus,atlantique
+Poissons osseux,Poisson-lune,Mola mola,atlantique
 Poissons osseux,Porte-écuelle,Lepadogaster lepadogaster,mediterranee
+Poissons osseux,Porte-écuelle de Candolle,Lepadogaster candolii,atlantique
+Poissons osseux,Porte-écuelle de Cornouailles,Lepadogaster purpurea,atlantique
+Poissons osseux,Porte-écuelle à petite tête,Apletodon dentatus,atlantique
+Poissons osseux,Prêtre,Atherina presbyter,atlantique
+Poissons osseux,Rascasse brune,Scorpaena porcus,mediterranee
 Poissons osseux,Rascasse de Madère,Scorpaena maderensis,mediterranee
-Poissons osseux,Rouget de roche,Mullus surmuletus,mediterranee
+Poissons osseux,Rombou podas,Bothus podas,mediterranee
+Poissons osseux,Rotengle,Scardinius erythrophthalmus,atlantique
+Poissons osseux,Rouget de roche,Mullus surmuletus,"atlantique,mediterranee"
 Poissons osseux,Sar commun,Diplodus sargus,mediterranee
+Poissons osseux,Sar commun atlantique,Diplodus cadenati,atlantique
 Poissons osseux,Sar tambour,Diplodus cervinus,mediterranee
+Poissons osseux,Sar à museau pointu,Diplodus puntazzo,mediterranee
 Poissons osseux,Sar à tête noire,Diplodus vulgaris,mediterranee
 Poissons osseux,Saupe,Sarpa salpa,mediterranee
+Poissons osseux,Serran commun,Serranus cabrilla,mediterranee
 Poissons osseux,Serran écriture,Serranus scriba,mediterranee
+Poissons osseux,Sole commune,Solea solea,atlantique
+Poissons osseux,Sparaillon commun,Diplodus annularis,mediterranee
 Poissons osseux,Squelette de poisson (indéterminé),Osteichthyes (indéterminé),mediterranee
-Cténophore,Groseille de mer,Pleurobrachia pileus,"mediterranee,atlantique"
-Cténophore,Béroé,Beroe ovata,mediterranee
-Bryozoaire,Dentelle de Neptune,Retepora cellulosa,mediterranee
-Bryozoaire,Bugule,Bugula sp.,"mediterranee,atlantique"
-Poissons cartilagineux,Torpille marbrée,Torpedo marmorata,"mediterranee,atlantique"
-Poissons cartilagineux,Raie pastenague,Dasyatis pastinaca,"mediterranee,atlantique"
-Poissons cartilagineux,Petite roussette,Scyliorhinus canicula,"mediterranee,atlantique"
-Poissons cartilagineux,Ange de mer,Squatina squatina,"mediterranee,atlantique"
-Tétrapode,Grand dauphin,Tursiops truncatus,"mediterranee,atlantique"
-Tétrapode,Tortue caouanne,Caretta caretta,"mediterranee,atlantique"
-Tétrapode,Phoque gris,Halichoerus grypus,atlantique
-Ver,Spirographe,Sabella pavonina,"mediterranee,atlantique"
-Poissons osseux,Congre,Conger conger,"mediterranee,atlantique"
+Poissons osseux,Sublet,Symphodus rostratus,mediterranee
+Poissons osseux,Syngnathe-aiguille,Syngnathus acus,atlantique
 Poissons osseux,Tacaud commun,Trisopterus luscus,atlantique
-Poissons osseux,Lieu jaune,Pollachius pollachius,atlantique
+Poissons osseux,Targeur,Zeugopterus punctatus,atlantique
+Poissons osseux,Triptérygion jaune,Tripterygion delaisi,"atlantique,mediterranee"
+Poissons osseux,Triptérygion nain,Tripterygion melanurus,mediterranee
+Poissons osseux,Triptérygion à bec,Tripterygion tripteronotum,mediterranee
+Poissons osseux,Truite commune européenne,Salmo trutta,atlantique
+Poissons osseux,Vairon commun,Phoxinus phoxinus,atlantique
 Poissons osseux,Vieille commune,Labrus bergylta,atlantique
-Poissons osseux,Chinchard commun,Trachurus trachurus,"mediterranee,atlantique"
-Poissons osseux,Bar européen,Dicentrarchus labrax,"mediterranee,atlantique"
-Mollusque,Seiche commune,Sepia officinalis,"mediterranee,atlantique"
-Mollusque,Poulpe commun,Octopus vulgaris,"mediterranee,atlantique"
-Mollusque,Ormeau européen,Haliotis tuberculata,atlantique
-Arthropode,Tourteau,Cancer pagurus,atlantique
-Arthropode,Homard européen,Homarus gammarus,atlantique
-Arthropode,Araignée de mer,Maja brachydactyla,atlantique
-Echinoderme,Oursin commun,Paracentrotus lividus,"mediterranee,atlantique"
-Echinoderme,Étoile de mer commune,Asterias rubens,atlantique
-Cnidaire,Anémone bijou,Corynactis viridis,"mediterranee,atlantique"
-Cnidaire,Anémone plumeuse,Metridium senile,atlantique
-Eponge,Éponge orange encroûtante,Hymeniacidon perlevis,"mediterranee,atlantique"
-Végétaux,Laminaire digitée,Laminaria digitata,atlantique
-Végétaux,Fucus vésiculeux,Fucus vesiculosus,atlantique
+Poissons osseux,Épinoche commune,Gasterosteus aculeatus,atlantique
+Poissons cartilagineux,Aigle commun,Myliobatis aquila,mediterranee
+Poissons cartilagineux,Ange de mer,Squatina squatina,"atlantique,mediterranee"
+Poissons cartilagineux,Diable de mer méditerranéen,Mobula mobular,mediterranee
+Poissons cartilagineux,Grande roussette,Scyliorhinus stellaris,"atlantique,mediterranee"
+Poissons cartilagineux,Pastenague violette,Pteroplatytrygon violacea,mediterranee
+Poissons cartilagineux,Petite roussette,Scyliorhinus canicula,"atlantique,mediterranee"
+Poissons cartilagineux,Raie bouclée,Raja clavata,"atlantique,mediterranee"
+Poissons cartilagineux,Raie brunette,Raja undulata,"atlantique,mediterranee"
+Poissons cartilagineux,Raie douce,Raja montagui,atlantique
+Poissons cartilagineux,Raie fleurie,Leucoraja naevus,atlantique
+Poissons cartilagineux,Raie lisse,Raja brachyura,"atlantique,mediterranee"
+Poissons cartilagineux,Raie mêlée,Raja microocellata,atlantique
+Poissons cartilagineux,Raie pastenague,Dasyatis pastinaca,"atlantique,mediterranee"
+Poissons cartilagineux,Raie étoilée,Raja asterias,mediterranee
+Poissons cartilagineux,Requin gris,Carcharhinus plumbeus,mediterranee
+Poissons cartilagineux,Requin hâ,Galeorhinus galeus,atlantique
+Poissons cartilagineux,Requin peau bleue,Prionace glauca,"atlantique,mediterranee"
+Poissons cartilagineux,Requin pointe noire,Carcharhinus melanopterus,atlantique
+Poissons cartilagineux,Requin-taureau,Carcharias taurus,"atlantique,mediterranee"
+Poissons cartilagineux,Torpille marbrée,Torpedo marmorata,"atlantique,mediterranee"
+Poissons cartilagineux,Torpille ocellée,Torpedo torpedo,mediterranee
+Poissons cartilagineux,Émissole lisse,Mustelus mustelus,atlantique
+Poissons cartilagineux,Émissole tachetée,Mustelus asterias,atlantique
+Tétrapode,Grand dauphin,Tursiops truncatus,"atlantique,mediterranee"
+Tétrapode,Phoque gris,Halichoerus grypus,atlantique
+Tétrapode,Tortue caouanne,Caretta caretta,"atlantique,mediterranee"
