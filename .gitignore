@@ -1,10 +1,10 @@
 .venv/
+.claude/
 __pycache__/
 *.pyc
 *.egg-info/
 build/
 dist/
-*.spec
 
 # Dossiers de travail utilisateur (entree/sortie de session, non versionnes)
 /input/
