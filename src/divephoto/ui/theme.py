@@ -124,4 +124,60 @@ QWidget#Card {{
     border: 1px solid {BORDER};
     border-radius: 14px;
 }}
+
+QWidget#Chip {{
+    background: {ACCENT_SOFT};
+    border: 1px solid {ACCENT};
+    border-radius: 13px;
+}}
+QWidget#Chip QLabel {{
+    color: {ACCENT_DARK};
+    font-weight: 600;
+    background: transparent;
+}}
+QWidget#Chip QLabel#ChipSub {{
+    color: {TEXT_SECONDARY};
+    font-weight: 400;
+    font-style: italic;
+}}
+QPushButton#ChipRemove {{
+    background: transparent;
+    color: {ACCENT_DARK};
+    border: none;
+    border-radius: 9px;
+    font-weight: 700;
+    padding: 0px;
+    min-width: 18px;
+    max-width: 18px;
+    min-height: 18px;
+    max-height: 18px;
+}}
+QPushButton#ChipRemove:hover {{
+    background: {DANGER};
+    color: white;
+}}
+
+QWidget#Badge {{
+    background: {ACCENT_DARK};
+    border-radius: 8px;
+}}
+QWidget#Badge QLabel {{
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    background: transparent;
+}}
+
+QListWidget {{
+    background: {CARD};
+    border: 1px solid {BORDER};
+    border-radius: 8px;
+    outline: none;
+}}
+QListWidget::item {{
+    border-bottom: 1px solid {BORDER};
+}}
+QListWidget::item:selected {{
+    background: {ACCENT_SOFT};
+}}
 """

@@ -11,6 +11,14 @@ RAW_EXTENSIONS = {
 JPEG_EXTENSIONS = {".jpg", ".jpeg"}
 SUPPORTED_EXTENSIONS = RAW_EXTENSIONS | JPEG_EXTENSIONS
 
+# Valeurs possibles pour DiveSession.region, utilisees pour pre-filtrer la
+# base d'especes (voir divephoto.species.SpeciesCatalog.for_region).
+REGIONS: list[tuple[str, str]] = [
+    ("Méditerranée", "mediterranee"),
+    ("Atlantique", "atlantique"),
+    ("Les deux", "les-deux"),
+]
+
 
 @dataclass
 class DiveSession:
@@ -19,6 +27,7 @@ class DiveSession:
     dive_site: str
     dive_date: date
     photographer: str
+    region: str = "les-deux"
 
     def __post_init__(self) -> None:
         self.input_dir = Path(self.input_dir)

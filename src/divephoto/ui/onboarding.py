@@ -7,10 +7,10 @@ from pathlib import Path
 from PySide6.QtCore import Signal, QDate, QSettings
 from PySide6.QtWidgets import (
     QWidget, QFormLayout, QLineEdit, QPushButton, QHBoxLayout, QVBoxLayout,
-    QDateEdit, QLabel, QFileDialog, QMessageBox,
+    QDateEdit, QLabel, QFileDialog, QMessageBox, QComboBox,
 )
 
-from divephoto.session import DiveSession
+from divephoto.session import REGIONS, DiveSession
 
 _ORG, _APP = "DivePhoto", "DivePhoto"
 
@@ -54,6 +54,9 @@ class OnboardingWidget(QWidget):
         self.output_picker = _DirPicker("Choisir le dossier de sortie")
         self.dive_site_edit = QLineEdit()
         self.dive_site_edit.setPlaceholderText("ex. Cap de Creus")
+        self.region_combo = QComboBox()
+        for label, value in REGIONS:
+            self.region_combo.addItem(label, value)
         self.photographer_edit = QLineEdit()
         self.photographer_edit.setPlaceholderText("ex. Emeric Truchet")
         self.date_edit = QDateEdit(QDate.currentDate())
@@ -68,6 +71,7 @@ class OnboardingWidget(QWidget):
         form.addRow("Dossier des photos brutes", self.input_picker)
         form.addRow("Dossier de sortie", self.output_picker)
         form.addRow("Lieu de plongée", self.dive_site_edit)
+        form.addRow("Zone", self.region_combo)
         form.addRow("Date de plongée", self.date_edit)
         form.addRow("Crédit photo (photographe)", self.photographer_edit)
 
@@ -106,17 +110,23 @@ class OnboardingWidget(QWidget):
         last_output = self._settings.value("last_output_dir", "", str)
         last_photographer = self._settings.value("last_photographer", "", str)
         last_site = self._settings.value("last_dive_site", "", str)
+        last_region = self._settings.value("last_region", "", str)
         if last_output:
             self.output_picker.set_path(last_output)
         if last_photographer:
             self.photographer_edit.setText(last_photographer)
         if last_site:
             self.dive_site_edit.setText(last_site)
+        if last_region:
+            idx = self.region_combo.findData(last_region)
+            if idx >= 0:
+                self.region_combo.setCurrentIndex(idx)
 
     def _remember_values(self, session: DiveSession) -> None:
         self._settings.setValue("last_output_dir", str(session.output_dir))
         self._settings.setValue("last_photographer", session.photographer)
         self._settings.setValue("last_dive_site", session.dive_site)
+        self._settings.setValue("last_region", session.region)
 
     def _on_start(self) -> None:
         errors = []
@@ -144,6 +154,7 @@ class OnboardingWidget(QWidget):
             dive_site=self.dive_site_edit.text().strip(),
             dive_date=self.date_edit.date().toPython(),
             photographer=self.photographer_edit.text().strip(),
+            region=self.region_combo.currentData(),
         )
         self._remember_values(session)
         self.session_ready.emit(session)
