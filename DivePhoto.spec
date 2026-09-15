@@ -5,7 +5,10 @@ a = Analysis(
     ['run_divephoto.py'],
     pathex=[],
     binaries=[],
-    datas=[('src/divephoto/data/species.csv', 'divephoto/data')],
+    datas=[
+        ('src/divephoto/data/species.csv', 'divephoto/data'),
+        ('src/divephoto/assets/app_icon.ico', 'divephoto/assets'),
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -34,4 +37,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['src/divephoto/assets/app_icon.ico'],
 )

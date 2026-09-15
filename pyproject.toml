@@ -27,4 +27,4 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-divephoto = ["data/*.csv"]
+divephoto = ["data/*.csv", "assets/*.ico"]

@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import sys
+from importlib import resources
 from pathlib import Path
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget
 
 from divephoto.imaging.color import CustomPresetParams
@@ -134,6 +136,8 @@ class MainWindow(QMainWindow):
 def main() -> None:
     app = QApplication(sys.argv)
     app.setStyleSheet(STYLESHEET)
+    icon_path = resources.files("divephoto.assets") / "app_icon.ico"
+    app.setWindowIcon(QIcon(str(icon_path)))
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
