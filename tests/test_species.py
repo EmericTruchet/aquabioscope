@@ -1,6 +1,6 @@
 import unittest
 
-from divephoto.species import EMBRANCHEMENT_ORDER, SpeciesCatalog, load_species
+from divephoto.species import EMBRANCHEMENT_ORDER, SpeciesCatalog, SpeciesEntry, load_species
 
 
 class SpeciesTest(unittest.TestCase):
@@ -22,10 +22,17 @@ class SpeciesTest(unittest.TestCase):
         self.assertTrue(any(e.nom_scientifique == "Epinephelus marginatus" for e in results))
 
     def test_region_filter_excludes_other_region_only_entries(self) -> None:
-        results = self.catalog.search("Homard", region="mediterranee")
-        self.assertEqual(results, [])
-        results_atl = self.catalog.search("Homard", region="atlantique")
-        self.assertTrue(len(results_atl) >= 1)
+        # Catalogue synthetique : independant du contenu reel (qui evolue au
+        # fil des mises a jour de la base) pour tester uniquement le
+        # mecanisme de filtrage par region.
+        atlantic_only = SpeciesEntry("Arthropode", "Espece test Atlantique", "Testus atlanticus", ("atlantique",))
+        both_regions = SpeciesEntry("Arthropode", "Espece test partagee", "Testus communis", ("atlantique", "mediterranee"))
+        catalog = SpeciesCatalog([atlantic_only, both_regions])
+
+        results_med = catalog.search("Espece test", region="mediterranee")
+        self.assertEqual(results_med, [both_regions])
+        results_atl = catalog.search("Espece test", region="atlantique")
+        self.assertEqual(set(results_atl), {atlantic_only, both_regions})
 
     def test_empty_query_returns_region_scoped_list(self) -> None:
         all_count = len(self.catalog.search(""))

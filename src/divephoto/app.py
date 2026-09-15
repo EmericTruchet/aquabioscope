@@ -17,7 +17,7 @@ from divephoto.ui.review import ReviewWidget
 from divephoto.ui.species_tagging import SpeciesTagWidget
 from divephoto.ui.theme import STYLESHEET
 
-REVIEW_THUMB_SIZE = 900
+REVIEW_THUMB_SIZE = 1600
 
 
 class MainWindow(QMainWindow):
