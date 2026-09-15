@@ -5,7 +5,8 @@ import numpy as np
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import (
-    QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget,
+    QDialog, QDialogButtonBox, QFormLayout, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QSlider,
+    QVBoxLayout, QWidget,
 )
 
 from divephoto.imaging.color import CustomPresetParams, apply_custom_preset
@@ -38,13 +39,25 @@ class CustomPresetDialog(QDialog):
     """Ajuste un preset personnalise sur un apercu reduit ; renvoie les
     parametres choisis (`self.params`) si l'utilisateur valide."""
 
-    def __init__(self, rgb_thumb: np.ndarray, initial: CustomPresetParams | None = None, parent=None) -> None:
+    def __init__(
+        self,
+        rgb_thumb: np.ndarray,
+        initial: CustomPresetParams | None = None,
+        initial_name: str = "",
+        existing_names: tuple[str, ...] = (),
+        parent=None,
+    ) -> None:
         super().__init__(parent)
-        self.setWindowTitle("Preset personnalisé")
-        self.resize(640, 620)
+        self.setWindowTitle("Nouveau preset personnalisé")
+        self.resize(640, 660)
 
         self._rgb_thumb = rgb_thumb
         self.params = initial or CustomPresetParams()
+        self.name = initial_name
+        self._existing_names = {n for n in existing_names if n != initial_name}
+
+        self.name_edit = QLineEdit(initial_name)
+        self.name_edit.setPlaceholderText('Nom du preset, ex. "Épaves sombres"')
 
         self.preview = QLabel()
         self.preview.setObjectName("MainPreview")
@@ -80,6 +93,8 @@ class CustomPresetDialog(QDialog):
         apply_btn.clicked.connect(self._on_apply)
         reset_btn.clicked.connect(self._on_reset)
 
+        form.insertRow(0, "Nom du preset", self.name_edit)
+
         layout = QVBoxLayout(self)
         layout.addWidget(self.preview, stretch=1)
         layout.addLayout(form)
@@ -113,5 +128,13 @@ class CustomPresetDialog(QDialog):
         self.row_saturation.slider.setValue(int(defaults.saturation * 100))
 
     def _on_apply(self) -> None:
+        name = self.name_edit.text().strip()
+        if not name:
+            QMessageBox.warning(self, "Nom manquant", "Merci de donner un nom à ce preset.")
+            return
+        if name in self._existing_names:
+            QMessageBox.warning(self, "Nom déjà utilisé", f"Un preset nommé « {name} » existe déjà.")
+            return
+        self.name = name
         self.params = self._current_params()
         self.accept()

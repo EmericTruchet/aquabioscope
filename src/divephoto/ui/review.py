@@ -3,9 +3,11 @@
 UX : un grand aperçu adaptatif affiche le preset actuellement retenu
 (par défaut "Naturel", puis le dernier choix fait — les photos d'une
 même plongée se ressemblent souvent). Une galerie de vignettes permet
-de basculer sur l'original ou un autre preset. Valider (clic sur
-l'aperçu, bouton, ou Entrée) passe à la photo suivante ; Supprimer
-(bouton ou touche Suppr) écarte la photo.
+de basculer sur l'original, un preset fixe, ou un preset personnalisé
+nommé (créé via la tuile "+", conservé d'une session à l'autre — voir
+divephoto.custom_presets_store). Valider (clic sur l'aperçu, bouton, ou
+Entrée) passe à la photo suivante ; Supprimer (bouton ou touche Suppr)
+écarte la photo.
 """
 from __future__ import annotations
 
@@ -15,10 +17,11 @@ import numpy as np
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QImage, QKeySequence, QPixmap, QShortcut
 from PySide6.QtWidgets import (
-    QHBoxLayout, QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget,
+    QHBoxLayout, QLabel, QMessageBox, QPushButton, QSizePolicy, QVBoxLayout, QWidget,
 )
 
-from divephoto.imaging.color import PRESETS, CustomPresetParams, apply_custom_preset
+from divephoto.custom_presets_store import load_named_presets, save_named_presets
+from divephoto.imaging.color import PRESETS, apply_custom_preset
 from divephoto.ui.custom_preset_dialog import CustomPresetDialog
 
 _TILES: list[tuple[str, str]] = [
@@ -27,8 +30,6 @@ _TILES: list[tuple[str, str]] = [
     ("profondeur", "Corrigé profondeur"),
     ("macro", "Macro contraste"),
 ]
-CUSTOM_KEY = "custom"
-CUSTOM_LABEL = "+ Personnalisé"
 DEFAULT_PRESET = "naturel"
 
 
@@ -91,15 +92,16 @@ class _GalleryThumb(QWidget):
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_label.setFixedSize(150, 104)
 
-        caption = QLabel(label)
-        caption.setObjectName("ThumbCaption")
-        caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.caption = QLabel(label)
+        self.caption.setObjectName("ThumbCaption")
+        self.caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.caption.setWordWrap(True)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6, 6, 6, 6)
         layout.setSpacing(4)
         layout.addWidget(self.image_label)
-        layout.addWidget(caption)
+        layout.addWidget(self.caption)
 
     def set_pixmap(self, pixmap: QPixmap) -> None:
         scaled = pixmap.scaled(
@@ -118,10 +120,41 @@ class _GalleryThumb(QWidget):
         self.clicked.emit(self._key)
 
 
+class _AddPresetTile(QWidget):
+    """Grande tuile "+" en pointillés pour créer un nouveau preset personnalisé."""
+
+    clicked = Signal()
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.setObjectName("AddPresetTile")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        plus = QLabel("+")
+        plus.setObjectName("AddPresetPlus")
+        plus.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        plus.setFixedSize(150, 104)
+
+        caption = QLabel("Nouveau preset")
+        caption.setObjectName("ThumbCaption")
+        caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setSpacing(4)
+        layout.addWidget(plus)
+        layout.addWidget(caption)
+
+    def mousePressEvent(self, event) -> None:  # noqa: N802
+        super().mousePressEvent(event)
+        self.clicked.emit()
+
+
 class ReviewWidget(QWidget):
     """Affiche une photo : grand aperçu du preset retenu + galerie pour en changer."""
 
-    choice_made = Signal(str, object)  # (chemin photo, cle preset choisi ou None si supprime)
+    choice_made = Signal(str, object)  # (chemin photo, cle/preset choisi ou None si supprime)
 
     def __init__(self) -> None:
         super().__init__()
@@ -129,7 +162,7 @@ class ReviewWidget(QWidget):
         self._current_thumb: np.ndarray | None = None
         self._versions: dict[str, QPixmap] = {}
         self._selected_key = DEFAULT_PRESET
-        self._custom_params: CustomPresetParams | None = None
+        self._named_presets = load_named_presets()
 
         self.progress_label = QLabel()
         self.progress_label.setObjectName("ProgressBadge")
@@ -146,23 +179,25 @@ class ReviewWidget(QWidget):
         self.preview.clicked.connect(self._confirm)
 
         self._thumbs: dict[str, _GalleryThumb] = {}
-        gallery = QHBoxLayout()
-        gallery.addStretch()
+        self.gallery_layout = QHBoxLayout()
+        self.gallery_layout.addStretch()
         for key, label in _TILES:
             thumb = _GalleryThumb(key, label)
             thumb.clicked.connect(self._select)
-            gallery.addWidget(thumb)
+            self.gallery_layout.addWidget(thumb)
             self._thumbs[key] = thumb
 
-        custom_thumb = _GalleryThumb(CUSTOM_KEY, CUSTOM_LABEL)
-        custom_thumb.clicked.connect(lambda _key: self._open_custom_dialog())
-        gallery.addWidget(custom_thumb)
-        self._thumbs[CUSTOM_KEY] = custom_thumb
-        gallery.addStretch()
+        self.add_tile = _AddPresetTile()
+        self.add_tile.clicked.connect(self._open_new_preset_dialog)
+        self.gallery_layout.addWidget(self.add_tile)
+        self.gallery_layout.addStretch()
+
+        for name in self._named_presets:
+            self._add_named_tile(name)
 
         hint = QLabel(
-            "Clique sur l'aperçu (ou Entrée) pour valider  •  1-4 pour changer de version  •  "
-            "5 pour un réglage personnalisé  •  Suppr pour écarter la photo"
+            "Clique sur l'aperçu (ou Entrée) pour valider  •  1-4 pour les presets fixes  •  "
+            "clic droit sur un preset personnalisé pour le supprimer  •  Suppr pour écarter la photo"
         )
         hint.setObjectName("HintBar")
         hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -184,22 +219,20 @@ class ReviewWidget(QWidget):
         layout.setSpacing(12)
         layout.addLayout(header)
         layout.addWidget(self.preview, stretch=1)
-        layout.addLayout(gallery)
+        layout.addLayout(self.gallery_layout)
         layout.addWidget(hint)
         layout.addLayout(actions)
 
         for i, (key, _label) in enumerate(_TILES):
             QShortcut(QKeySequence(str(i + 1)), self, activated=lambda k=key: self._select(k))
-        QShortcut(QKeySequence("5"), self, activated=self._open_custom_dialog)
         QShortcut(QKeySequence(Qt.Key.Key_Return), self, activated=self._confirm)
         QShortcut(QKeySequence(Qt.Key.Key_Enter), self, activated=self._confirm)
         QShortcut(QKeySequence(Qt.Key.Key_Delete), self, activated=self._delete)
 
     def show_photo(self, path: Path, rgb_thumb: np.ndarray, index: int, total: int) -> None:
-        """Affiche une nouvelle photo (déjà décodée + réduite) avec ses 4 versions."""
+        """Affiche une nouvelle photo (déjà décodée + réduite) avec toutes ses versions."""
         self._current_path = path
         self._current_thumb = rgb_thumb
-        self._custom_params = None
         self.progress_label.setText(f"Photo {index + 1} / {total}")
         self.filename_label.setText(path.name)
 
@@ -209,14 +242,15 @@ class ReviewWidget(QWidget):
             pixmap = _rgb_to_pixmap(fn(rgb_thumb))
             self._versions[key] = pixmap
             self._thumbs[key].set_pixmap(pixmap)
-
-        self._versions.pop(CUSTOM_KEY, None)
-        self._thumbs[CUSTOM_KEY].image_label.clear()
+        for name, params in self._named_presets.items():
+            pixmap = _rgb_to_pixmap(apply_custom_preset(rgb_thumb, params))
+            self._versions[name] = pixmap
+            self._thumbs[name].set_pixmap(pixmap)
 
         # Choix "maintenu" : on garde le dernier preset choisi comme point de
-        # depart pour la photo suivante (souvent la meme lumiere/scene) — sauf
-        # un reglage personnalise, propre a la photo precedente.
-        initial_key = self._selected_key if self._selected_key != CUSTOM_KEY else DEFAULT_PRESET
+        # depart pour la photo suivante (souvent la meme lumiere/scene), sauf
+        # s'il a ete supprime entre-temps.
+        initial_key = self._selected_key if self._selected_key in self._versions else DEFAULT_PRESET
         self._select(initial_key)
 
     def _select(self, key: str) -> None:
@@ -227,23 +261,59 @@ class ReviewWidget(QWidget):
         for k, thumb in self._thumbs.items():
             thumb.set_selected(k == key)
 
-    def _open_custom_dialog(self) -> None:
+    def _add_named_tile(self, name: str) -> None:
+        thumb = _GalleryThumb(name, name)
+        thumb.clicked.connect(self._select)
+        thumb.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        thumb.customContextMenuRequested.connect(lambda _pos, n=name: self._maybe_delete_named(n))
+        insert_index = self.gallery_layout.indexOf(self.add_tile)
+        self.gallery_layout.insertWidget(insert_index, thumb)
+        self._thumbs[name] = thumb
+
+    def _open_new_preset_dialog(self) -> None:
         if self._current_thumb is None:
             return
-        dialog = CustomPresetDialog(self._current_thumb, initial=self._custom_params, parent=self)
+        dialog = CustomPresetDialog(
+            self._current_thumb, existing_names=tuple(self._named_presets), parent=self
+        )
         if dialog.exec() != CustomPresetDialog.DialogCode.Accepted:
             return
-        self._custom_params = dialog.params
-        result = apply_custom_preset(self._current_thumb, self._custom_params)
-        pixmap = _rgb_to_pixmap(result)
-        self._versions[CUSTOM_KEY] = pixmap
-        self._thumbs[CUSTOM_KEY].set_pixmap(pixmap)
-        self._select(CUSTOM_KEY)
+
+        name, params = dialog.name, dialog.params
+        self._named_presets[name] = params
+        save_named_presets(self._named_presets)
+
+        self._add_named_tile(name)
+        pixmap = _rgb_to_pixmap(apply_custom_preset(self._current_thumb, params))
+        self._versions[name] = pixmap
+        self._thumbs[name].set_pixmap(pixmap)
+        self._select(name)
+
+    def _maybe_delete_named(self, name: str) -> None:
+        reply = QMessageBox.question(
+            self, "Supprimer ce preset",
+            f"Supprimer définitivement le preset personnalisé « {name} » ?\n"
+            "(les photos déjà validées avec ce preset ne sont pas affectées)",
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        self._named_presets.pop(name, None)
+        save_named_presets(self._named_presets)
+
+        thumb = self._thumbs.pop(name, None)
+        if thumb is not None:
+            self.gallery_layout.removeWidget(thumb)
+            thumb.deleteLater()
+        self._versions.pop(name, None)
+
+        if self._selected_key == name:
+            self._select(DEFAULT_PRESET)
 
     def _confirm(self) -> None:
         if self._current_path is None:
             return
-        value = self._custom_params if self._selected_key == CUSTOM_KEY else self._selected_key
+        value = self._named_presets.get(self._selected_key, self._selected_key)
         self.choice_made.emit(str(self._current_path), value)
 
     def _delete(self) -> None:

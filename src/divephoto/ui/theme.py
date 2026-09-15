@@ -168,6 +168,24 @@ QWidget#Badge QLabel {{
     background: transparent;
 }}
 
+QWidget#AddPresetTile {{
+    border: 2px dashed #B7C3C8;
+    border-radius: 8px;
+}}
+QWidget#AddPresetTile:hover {{
+    border: 2px dashed {ACCENT};
+    background: {ACCENT_SOFT};
+}}
+QLabel#AddPresetPlus {{
+    font-size: 40px;
+    font-weight: 300;
+    color: #B7C3C8;
+    background: transparent;
+}}
+QWidget#AddPresetTile:hover QLabel#AddPresetPlus {{
+    color: {ACCENT_DARK};
+}}
+
 QListWidget {{
     background: {CARD};
     border: 1px solid {BORDER};
