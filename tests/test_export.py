@@ -10,16 +10,16 @@ from divephoto.export import build_filename, draw_credit, export_photo, slugify
 
 class ExportTest(unittest.TestCase):
     def test_slugify_strips_accents_and_specials(self) -> None:
-        self.assertEqual(slugify("Cap de Creus !"), "cap-de-creus")
-        self.assertEqual(slugify("Mérou brun"), "merou-brun")
+        self.assertEqual(slugify("Cap de Creus !"), "Cap-de-creus")
+        self.assertEqual(slugify("Mérou brun"), "Merou-brun")
 
-    def test_build_filename_includes_site_species_and_date(self) -> None:
+    def test_build_filename_puts_species_first_then_site(self) -> None:
         name = build_filename("Cap de Creus", ["Mérou brun", "Sar commun"], date(2026, 9, 7), 3)
-        self.assertEqual(name, "cap-de-creus_merou-brun-sar-commun_20260907_0003.jpg")
+        self.assertEqual(name, "Merou-brun_Sar-commun_Cap-de-creus_20260907_0003.jpg")
 
     def test_build_filename_without_species(self) -> None:
         name = build_filename("Cap de Creus", [], date(2026, 9, 7), 1)
-        self.assertEqual(name, "cap-de-creus_20260907_0001.jpg")
+        self.assertEqual(name, "Cap-de-creus_20260907_0001.jpg")
 
     def test_draw_credit_returns_same_shape(self) -> None:
         rgb = np.zeros((200, 300, 3), dtype=np.uint8)
@@ -48,7 +48,7 @@ class ExportTest(unittest.TestCase):
                 seq=1,
             )
             self.assertTrue(result.output_path.exists())
-            self.assertEqual(result.output_path.name, "cap-de-creus_merou-brun_20260907_0001.jpg")
+            self.assertEqual(result.output_path.name, "Merou-brun_Cap-de-creus_20260907_0001.jpg")
 
 
 if __name__ == "__main__":

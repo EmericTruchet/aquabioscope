@@ -20,16 +20,20 @@ def slugify(text: str) -> str:
     cleaned = "".join(c if c.isalnum() else "-" for c in ascii_text.lower())
     while "--" in cleaned:
         cleaned = cleaned.replace("--", "-")
-    return cleaned.strip("-")
+    slug = cleaned.strip("-")
+    return slug[0].upper() + slug[1:] if slug else slug
 
 
 def build_filename(dive_site: str, species_names: list[str], dive_date, seq: int, ext: str = ".jpg") -> str:
-    site_slug = slugify(dive_site) or "plongee"
+    """Nom de fichier : espèce(s) d'abord (le plus utile pour trier/chercher
+    dans le dossier de sortie), puis lieu, date, numéro. Chaque nom (lieu,
+    chaque espèce) commence par une majuscule."""
+    site_slug = slugify(dive_site) or "Plongee"
     date_str = dive_date.strftime("%Y%m%d")
-    species_slug = "-".join(slugify(s) for s in species_names[:3] if slugify(s))
-    parts = [site_slug]
-    if species_slug:
-        parts.append(species_slug)
+    species_slugs = [slugify(s) for s in species_names[:3] if slugify(s)]
+
+    parts = list(species_slugs)
+    parts.append(site_slug)
     parts.append(date_str)
     parts.append(f"{seq:04d}")
     return "_".join(parts) + ext
