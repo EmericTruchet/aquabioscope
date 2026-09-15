@@ -166,9 +166,9 @@ class SpeciesTagWidget(QWidget):
         right_col = QVBoxLayout()
         right_col.addWidget(title)
         right_col.addLayout(search_row)
-        right_col.addWidget(self.results_list, stretch=1)
         right_col.addWidget(chips_title)
         right_col.addWidget(self.chips_container)
+        right_col.addWidget(self.results_list, stretch=1)
 
         content = QHBoxLayout()
         content.addLayout(left_col)
