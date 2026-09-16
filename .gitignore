@@ -8,9 +8,11 @@ dist/
 AppDir/
 appimagetool
 *.AppImage
-# Copie de l'exe compile dans site/ (genere, pas du code source ; a
-# recopier depuis dist/ avant deploiement, voir site/README).
+# Binaires compiles copies dans site/ pour la page de telechargement
+# (generes, pas du code source ; a redeposer manuellement avant deploiement).
 site/AquaBioScope.exe
+site/AquaBioScope-*.zip
+site/AquaBioScope-*.AppImage
 
 # Dossiers de travail utilisateur (entree/sortie de session, non versionnes)
 /input/
