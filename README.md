@@ -19,6 +19,27 @@ python -m venv .venv
 
 Le résultat est généré dans `dist\DivePhoto\` (à distribuer en entier, voir `GUIDE_UTILISATION.md`).
 
+## Compilation de l'application macOS
+
+PyInstaller ne fait pas de cross-compilation : impossible de générer une app macOS depuis Windows.
+La compilation se fait automatiquement sur des machines macOS via GitHub Actions
+(`.github/workflows/build-macos.yml`), déclenchée manuellement (onglet *Actions* du dépôt,
+bouton *Run workflow*) ou à la création d'un tag `v*`. Elle produit deux archives
+(`DivePhoto-macos-intel.zip` et `DivePhoto-macos-apple-silicon.zip`) téléchargeables comme
+artefacts du run, ou attachées automatiquement à la Release si déclenchée par un tag.
+
+Pour compiler manuellement sur un vrai Mac :
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -e . pyinstaller
+.venv/bin/pyinstaller DivePhoto-macos.spec --noconfirm
+```
+
+Le résultat est `dist/DivePhoto.app`. L'app n'étant pas signée par un compte développeur Apple
+(payant), macOS affichera un avertissement « développeur non identifié » au premier lancement :
+l'utilisateur doit faire clic droit → *Ouvrir* → *Ouvrir* (une seule fois).
+
 ## Tests
 
 ```powershell
