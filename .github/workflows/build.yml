@@ -6,6 +6,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -28,7 +31,7 @@ jobs:
         run: pyinstaller AquaBioScope.spec --noconfirm
 
       - name: Création de l'archive .zip
-        run: Compress-Archive -Path dist/AquaBioScope -DestinationPath dist/AquaBioScope-windows.zip
+        run: Compress-Archive -Path dist/AquaBioScope.exe -DestinationPath dist/AquaBioScope-windows.zip
 
       - name: Publication de l'archive comme artefact
         uses: actions/upload-artifact@v4
