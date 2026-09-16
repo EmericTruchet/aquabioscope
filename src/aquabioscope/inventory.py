@@ -8,7 +8,7 @@ from pathlib import Path
 import openpyxl
 from openpyxl.styles import Font
 
-from divephoto.species import EMBRANCHEMENT_ORDER, SpeciesEntry
+from aquabioscope.species import EMBRANCHEMENT_ORDER, SpeciesEntry
 
 HEADERS = ["Embranchement", "Nom français", "Nom latin"]
 

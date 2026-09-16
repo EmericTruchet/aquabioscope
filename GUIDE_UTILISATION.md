@@ -1,10 +1,10 @@
-# DivePhoto — guide d'utilisation
+# AquaBioScope — guide d'utilisation
 
 Logiciel de retouche colorimétrique, tag d'espèces et renommage en masse pour photos de plongée sous-marine.
 
 ## Installation
 
-Aucune installation requise : un seul fichier, `DivePhoto.exe`, à enregistrer où tu veux et à double-cliquer. Le premier lancement est un peu plus lent que les suivants (quelques secondes, le temps que l'exécutable se décompresse en mémoire).
+Aucune installation requise : un seul fichier, `AquaBioScope.exe`, à enregistrer où tu veux et à double-cliquer. Le premier lancement est un peu plus lent que les suivants (quelques secondes, le temps que l'exécutable se décompresse en mémoire).
 
 Windows peut afficher un avertissement SmartScreen ("Windows a protégé votre ordinateur") au premier lancement, le temps que l'exécutable se fasse connaître : clique sur **Informations complémentaires** puis **Exécuter quand même**.
 

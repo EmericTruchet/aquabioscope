@@ -4,8 +4,8 @@ from tempfile import TemporaryDirectory
 
 import openpyxl
 
-from divephoto.inventory import unique_sorted_species, write_inventory_xlsx
-from divephoto.species import SpeciesEntry
+from aquabioscope.inventory import unique_sorted_species, write_inventory_xlsx
+from aquabioscope.species import SpeciesEntry
 
 
 class InventoryTest(unittest.TestCase):

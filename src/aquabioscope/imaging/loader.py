@@ -7,7 +7,7 @@ import numpy as np
 import rawpy
 from PIL import Image, ImageOps
 
-from divephoto.session import RAW_EXTENSIONS
+from aquabioscope.session import RAW_EXTENSIONS
 
 
 def load_rgb(path: Path) -> np.ndarray:

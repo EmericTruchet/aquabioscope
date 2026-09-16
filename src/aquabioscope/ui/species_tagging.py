@@ -18,8 +18,8 @@ from PySide6.QtWidgets import (
     QSizePolicy, QVBoxLayout, QWidget,
 )
 
-from divephoto.species import SpeciesCatalog, SpeciesEntry
-from divephoto.ui.flow_layout import FlowLayout
+from aquabioscope.species import SpeciesCatalog, SpeciesEntry
+from aquabioscope.ui.flow_layout import FlowLayout
 
 UNLISTED_EMBRANCHEMENT = "À préciser"
 GOOGLE_LENS_URL = "https://lens.google.com/upload"

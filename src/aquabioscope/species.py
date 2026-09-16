@@ -85,7 +85,7 @@ class SpeciesEntry:
 
 
 def _default_csv_path() -> Path:
-    return resources.files("divephoto.data") / "species.csv"
+    return resources.files("aquabioscope.data") / "species.csv"
 
 
 def load_species(csv_path: Path | None = None) -> list[SpeciesEntry]:

@@ -1,14 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
 # Spec PyInstaller pour macOS (doit être exécuté sur un Mac, ex. via GitHub Actions).
-# Équivalent de DivePhoto.spec (Windows) mais produit une app bundle .app avec icône .icns.
+# Équivalent de AquaBioScope.spec (Windows) mais produit une app bundle .app avec icône .icns.
 
 a = Analysis(
-    ['run_divephoto.py'],
+    ['run_aquabioscope.py'],
     pathex=[],
     binaries=[],
     datas=[
-        ('src/divephoto/data/species.csv', 'divephoto/data'),
-        ('src/divephoto/assets/app_icon.icns', 'divephoto/assets'),
+        ('src/aquabioscope/data/species.csv', 'aquabioscope/data'),
+        ('src/aquabioscope/assets/app_icon.icns', 'aquabioscope/assets'),
     ],
     hiddenimports=[],
     hookspath=[],
@@ -25,7 +25,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='DivePhoto',
+    name='AquaBioScope',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -45,19 +45,19 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='DivePhoto',
+    name='AquaBioScope',
 )
 
 app = BUNDLE(
     coll,
-    name='DivePhoto.app',
-    icon='src/divephoto/assets/app_icon.icns',
-    bundle_identifier='com.divephoto.app',
+    name='AquaBioScope.app',
+    icon='src/aquabioscope/assets/app_icon.icns',
+    bundle_identifier='com.aquabioscope.app',
     info_plist={
-        'CFBundleName': 'DivePhoto',
-        'CFBundleDisplayName': 'DivePhoto',
+        'CFBundleName': 'AquaBioScope',
+        'CFBundleDisplayName': 'AquaBioScope',
         'CFBundleShortVersionString': '0.1.0',
         'NSHighResolutionCapable': True,
-        'NSHumanReadableCopyright': 'DivePhoto',
+        'NSHumanReadableCopyright': 'AquaBioScope',
     },
 )

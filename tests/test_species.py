@@ -1,6 +1,6 @@
 import unittest
 
-from divephoto.species import EMBRANCHEMENT_ORDER, SpeciesCatalog, SpeciesEntry, load_species
+from aquabioscope.species import EMBRANCHEMENT_ORDER, SpeciesCatalog, SpeciesEntry, load_species
 
 
 class SpeciesTest(unittest.TestCase):

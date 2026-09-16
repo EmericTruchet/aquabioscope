@@ -2,7 +2,7 @@
 l'utilisateur et conservés d'une session à l'autre.
 
 Stockage : un fichier JSON dans le dossier de profil utilisateur Windows
-(%APPDATA%\\DivePhoto\\custom_presets.json), jamais dans l'exécutable —
+(%APPDATA%\\AquaBioScope\\custom_presets.json), jamais dans l'exécutable —
 un .exe compilé est un fichier figé, rien ne peut s'y réécrire après coup.
 """
 from __future__ import annotations
@@ -12,12 +12,12 @@ import os
 from dataclasses import asdict
 from pathlib import Path
 
-from divephoto.imaging.color import CustomPresetParams
+from aquabioscope.imaging.color import CustomPresetParams
 
 
 def default_store_path() -> Path:
     base = Path(os.environ.get("APPDATA", Path.home()))
-    return base / "DivePhoto" / "custom_presets.json"
+    return base / "AquaBioScope" / "custom_presets.json"
 
 
 def load_named_presets(path: Path | None = None) -> dict[str, CustomPresetParams]:

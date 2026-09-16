@@ -33,21 +33,21 @@ jobs:
           pip install pyinstaller
 
       - name: Compilation avec PyInstaller
-        run: pyinstaller DivePhoto-macos.spec --noconfirm
+        run: pyinstaller AquaBioScope-macos.spec --noconfirm
 
       - name: Création de l'archive .zip de l'app
         run: |
           cd dist
-          ditto -c -k --sequesterRsrc --keepParent DivePhoto.app DivePhoto-macos-${{ matrix.arch_name }}.zip
+          ditto -c -k --sequesterRsrc --keepParent AquaBioScope.app AquaBioScope-macos-${{ matrix.arch_name }}.zip
 
       - name: Publication de l'archive comme artefact
         uses: actions/upload-artifact@v4
         with:
-          name: DivePhoto-macos-${{ matrix.arch_name }}
-          path: dist/DivePhoto-macos-${{ matrix.arch_name }}.zip
+          name: AquaBioScope-macos-${{ matrix.arch_name }}
+          path: dist/AquaBioScope-macos-${{ matrix.arch_name }}.zip
 
       - name: Ajout au Release GitHub (si déclenché par un tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/DivePhoto-macos-${{ matrix.arch_name }}.zip
+          files: dist/AquaBioScope-macos-${{ matrix.arch_name }}.zip

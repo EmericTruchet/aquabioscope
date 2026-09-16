@@ -12,7 +12,7 @@ JPEG_EXTENSIONS = {".jpg", ".jpeg"}
 SUPPORTED_EXTENSIONS = RAW_EXTENSIONS | JPEG_EXTENSIONS
 
 # Valeurs possibles pour DiveSession.region, utilisees pour pre-filtrer la
-# base d'especes (voir divephoto.species.SpeciesCatalog.for_region). La base
+# base d'especes (voir aquabioscope.species.SpeciesCatalog.for_region). La base
 # embarquee ne couvre aujourd'hui bien que les deux premieres ; les autres
 # zones affichent la base complete (non filtree) faute de donnees dediees.
 REGIONS: list[tuple[str, str]] = [

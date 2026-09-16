@@ -2,12 +2,12 @@
 
 
 a = Analysis(
-    ['run_divephoto.py'],
+    ['run_aquabioscope.py'],
     pathex=[],
     binaries=[],
     datas=[
-        ('src/divephoto/data/species.csv', 'divephoto/data'),
-        ('src/divephoto/assets/app_icon.ico', 'divephoto/assets'),
+        ('src/aquabioscope/data/species.csv', 'aquabioscope/data'),
+        ('src/aquabioscope/assets/app_icon.ico', 'aquabioscope/assets'),
     ],
     hiddenimports=[],
     hookspath=[],
@@ -26,7 +26,7 @@ exe = EXE(
     a.datas,
     [],
     exclude_binaries=False,
-    name='DivePhoto',
+    name='AquaBioScope',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -37,5 +37,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['src/divephoto/assets/app_icon.ico'],
+    icon=['src/aquabioscope/assets/app_icon.ico'],
 )

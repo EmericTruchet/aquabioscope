@@ -8,12 +8,12 @@ from PySide6.QtCore import QThread, Signal
 
 from functools import partial
 
-from divephoto.export import export_photo, slugify
-from divephoto.imaging.color import PRESETS, CustomPresetParams, apply_custom_preset
-from divephoto.imaging.loader import load_rgb
-from divephoto.inventory import unique_sorted_species, write_inventory_xlsx
-from divephoto.session import DiveSession
-from divephoto.species import SpeciesEntry
+from aquabioscope.export import export_photo, slugify
+from aquabioscope.imaging.color import PRESETS, CustomPresetParams, apply_custom_preset
+from aquabioscope.imaging.loader import load_rgb
+from aquabioscope.inventory import unique_sorted_species, write_inventory_xlsx
+from aquabioscope.session import DiveSession
+from aquabioscope.species import SpeciesEntry
 
 
 class ExportWorker(QThread):

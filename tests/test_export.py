@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 
 import numpy as np
 
-from divephoto.export import build_filename, draw_credit, export_photo, slugify
+from aquabioscope.export import build_filename, draw_credit, export_photo, slugify
 
 
 class ExportTest(unittest.TestCase):

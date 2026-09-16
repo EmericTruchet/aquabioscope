@@ -5,7 +5,7 @@ UX : un grand aperçu adaptatif affiche le preset actuellement retenu
 même plongée se ressemblent souvent). Une galerie de vignettes permet
 de basculer sur l'original, un preset fixe, ou un preset personnalisé
 nommé (créé via la tuile "+", conservé d'une session à l'autre — voir
-divephoto.custom_presets_store). Valider (clic sur l'aperçu, bouton, ou
+aquabioscope.custom_presets_store). Valider (clic sur l'aperçu, bouton, ou
 Entrée) passe à la photo suivante ; Supprimer (bouton ou touche Suppr)
 écarte la photo.
 """
@@ -20,9 +20,9 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QLabel, QMessageBox, QPushButton, QSizePolicy, QVBoxLayout, QWidget,
 )
 
-from divephoto.custom_presets_store import load_named_presets, save_named_presets
-from divephoto.imaging.color import PRESETS, apply_custom_preset
-from divephoto.ui.custom_preset_dialog import CustomPresetDialog
+from aquabioscope.custom_presets_store import load_named_presets, save_named_presets
+from aquabioscope.imaging.color import PRESETS, apply_custom_preset
+from aquabioscope.ui.custom_preset_dialog import CustomPresetDialog
 
 _TILES: list[tuple[str, str]] = [
     ("original", "Original"),

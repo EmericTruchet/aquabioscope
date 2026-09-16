@@ -1,4 +1,4 @@
-"""Point d'entrée de l'application DivePhoto."""
+"""Point d'entrée de l'application AquaBioScope."""
 from __future__ import annotations
 
 import sys
@@ -8,16 +8,16 @@ from pathlib import Path
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget
 
-from divephoto.imaging.color import CustomPresetParams
-from divephoto.imaging.loader import load_rgb, make_thumbnail
-from divephoto.session import DiveSession
-from divephoto.species import SpeciesCatalog, SpeciesEntry
-from divephoto.ui.export_screens import ExportProgressWidget, SessionCompleteWidget
-from divephoto.ui.export_worker import ExportWorker
-from divephoto.ui.onboarding import OnboardingWidget
-from divephoto.ui.review import ReviewWidget
-from divephoto.ui.species_tagging import SpeciesTagWidget
-from divephoto.ui.theme import STYLESHEET
+from aquabioscope.imaging.color import CustomPresetParams
+from aquabioscope.imaging.loader import load_rgb, make_thumbnail
+from aquabioscope.session import DiveSession
+from aquabioscope.species import SpeciesCatalog, SpeciesEntry
+from aquabioscope.ui.export_screens import ExportProgressWidget, SessionCompleteWidget
+from aquabioscope.ui.export_worker import ExportWorker
+from aquabioscope.ui.onboarding import OnboardingWidget
+from aquabioscope.ui.review import ReviewWidget
+from aquabioscope.ui.species_tagging import SpeciesTagWidget
+from aquabioscope.ui.theme import STYLESHEET
 
 REVIEW_THUMB_SIZE = 1600
 
@@ -25,7 +25,7 @@ REVIEW_THUMB_SIZE = 1600
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("DivePhoto")
+        self.setWindowTitle("AquaBioScope")
         self.resize(1100, 800)
 
         self.session: DiveSession | None = None
@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
 def main() -> None:
     app = QApplication(sys.argv)
     app.setStyleSheet(STYLESHEET)
-    icon_path = resources.files("divephoto.assets") / "app_icon.ico"
+    icon_path = resources.files("aquabioscope.assets") / "app_icon.ico"
     app.setWindowIcon(QIcon(str(icon_path)))
     window = MainWindow()
     window.show()

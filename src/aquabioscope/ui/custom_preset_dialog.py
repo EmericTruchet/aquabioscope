@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget,
 )
 
-from divephoto.imaging.color import CustomPresetParams, apply_custom_preset
+from aquabioscope.imaging.color import CustomPresetParams, apply_custom_preset
 
 
 def _rgb_to_pixmap(rgb: np.ndarray) -> QPixmap:

@@ -1,5 +1,5 @@
 [project]
-name = "divephoto"
+name = "aquabioscope"
 version = "0.1.0"
 description = "Retouche colorimétrique, renommage en masse et tag d'espèces pour photos de plongée sous-marine"
 requires-python = ">=3.11"
@@ -17,7 +17,7 @@ dependencies = [
 build = ["pyinstaller>=6.0"]
 
 [project.scripts]
-divephoto = "divephoto.app:main"
+aquabioscope = "aquabioscope.app:main"
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -27,4 +27,4 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-divephoto = ["data/*.csv", "assets/*.ico"]
+aquabioscope = ["data/*.csv", "assets/*.ico", "assets/*.icns"]

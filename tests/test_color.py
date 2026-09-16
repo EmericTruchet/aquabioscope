@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from divephoto.imaging.color import (
+from aquabioscope.imaging.color import (
     PRESETS, CustomPresetParams, apply_custom_preset, gray_world_balance, restore_red_channel,
 )
 

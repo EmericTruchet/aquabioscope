@@ -3,7 +3,7 @@ from datetime import date
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from divephoto.session import DiveSession
+from aquabioscope.session import DiveSession
 
 
 class DiveSessionTest(unittest.TestCase):

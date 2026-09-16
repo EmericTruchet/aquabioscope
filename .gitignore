@@ -7,7 +7,7 @@ build/
 dist/
 # Copie de l'exe compile dans site/ (genere, pas du code source ; a
 # recopier depuis dist/ avant deploiement, voir site/README).
-site/DivePhoto.exe
+site/AquaBioScope.exe
 
 # Dossiers de travail utilisateur (entree/sortie de session, non versionnes)
 /input/

@@ -2,8 +2,8 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from divephoto.custom_presets_store import load_named_presets, save_named_presets
-from divephoto.imaging.color import CustomPresetParams
+from aquabioscope.custom_presets_store import load_named_presets, save_named_presets
+from aquabioscope.imaging.color import CustomPresetParams
 
 
 class CustomPresetsStoreTest(unittest.TestCase):

@@ -10,9 +10,9 @@ from PySide6.QtWidgets import (
     QDateEdit, QLabel, QFileDialog, QMessageBox, QComboBox,
 )
 
-from divephoto.session import REGIONS, DiveSession
+from aquabioscope.session import REGIONS, DiveSession
 
-_ORG, _APP = "DivePhoto", "DivePhoto"
+_ORG, _APP = "AquaBioScope", "AquaBioScope"
 
 
 class _DirPicker(QWidget):
@@ -79,7 +79,7 @@ class OnboardingWidget(QWidget):
         start_btn.setMinimumHeight(40)
         start_btn.clicked.connect(self._on_start)
 
-        title = QLabel("🤿 Nouvelle session DivePhoto")
+        title = QLabel("🤿 Nouvelle session AquaBioScope")
         title.setObjectName("Title")
         subtitle = QLabel("Retouche, tags d'espèces et export en un seul passage, photo par photo.")
         subtitle.setObjectName("Subtitle")
