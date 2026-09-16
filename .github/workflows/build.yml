@@ -46,15 +46,16 @@ jobs:
           files: dist/AquaBioScope-windows.zip
 
   build-macos:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-13
-            arch_name: intel
-          - os: macos-14
-            arch_name: apple-silicon
-    runs-on: ${{ matrix.os }}
+    # macOS Apple Silicon uniquement : Apple ne vend plus de Mac Intel depuis
+    # 2023 et GitHub a retire son runner macos-13 (le job restait bloque en
+    # file d'attente indefiniment, jamais assez de capacite pour le lancer).
+    # Un vrai runner Intel existe encore (macos-15-large) mais est payant
+    # meme sur un depot public - non retenu ici.
+    runs-on: macos-15
+    env:
+      # Cible de compatibilite plus basse que le runner de compilation, pour
+      # que l'app tourne aussi sur des Mac un peu plus anciens que macOS 15.
+      MACOSX_DEPLOYMENT_TARGET: "13.0"
     steps:
       - name: Récupération du code
         uses: actions/checkout@v4
@@ -76,19 +77,19 @@ jobs:
       - name: Création de l'archive .zip de l'app
         run: |
           cd dist
-          ditto -c -k --sequesterRsrc --keepParent AquaBioScope.app AquaBioScope-macos-${{ matrix.arch_name }}.zip
+          ditto -c -k --sequesterRsrc --keepParent AquaBioScope.app AquaBioScope-macos.zip
 
       - name: Publication de l'archive comme artefact
         uses: actions/upload-artifact@v4
         with:
-          name: AquaBioScope-macos-${{ matrix.arch_name }}
-          path: dist/AquaBioScope-macos-${{ matrix.arch_name }}.zip
+          name: AquaBioScope-macos
+          path: dist/AquaBioScope-macos.zip
 
       - name: Ajout au Release GitHub (si déclenché par un tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/AquaBioScope-macos-${{ matrix.arch_name }}.zip
+          files: dist/AquaBioScope-macos.zip
 
   build-linux:
     runs-on: ubuntu-22.04

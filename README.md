@@ -30,9 +30,10 @@ Le résultat est généré dans `dist\AquaBioScope\` (à distribuer en entier, v
    git tag vx.y.z
    git push origin vx.y.z
    ```
-3. Le tag déclenche `.github/workflows/build.yml`, qui compile **Windows, macOS (Intel +
-   Apple Silicon) et Linux**, et publie les 4 fichiers sur une **Release GitHub** correspondant au
-   tag.
+3. Le tag déclenche `.github/workflows/build.yml`, qui compile **Windows, macOS (Apple Silicon)
+   et Linux**, et publie les 3 fichiers sur une **Release GitHub** correspondant au tag. (Pas de
+   build macOS Intel : Apple n'en vend plus depuis 2023, et GitHub ne propose plus de runner Intel
+   gratuit — l'alternative payante n'a pas été retenue.)
 4. La page de téléchargement (`site/index.html`) va chercher toute seule (en JavaScript, au
    chargement) la dernière Release via l'API GitHub : version affichée et liens de téléchargement
    se mettent à jour automatiquement, sans ré-upload FTP des exécutables.
