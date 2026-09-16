@@ -1,6 +1,6 @@
 [project]
 name = "aquabioscope"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Retouche colorimétrique, renommage en masse et tag d'espèces pour photos de plongée sous-marine"
 requires-python = ">=3.11"
 dependencies = [
@@ -26,6 +26,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "aquabioscope.__version__"}
 
 [tool.setuptools.package-data]
 aquabioscope = ["data/*.csv", "assets/*.ico", "assets/*.icns"]

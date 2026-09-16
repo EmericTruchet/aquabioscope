@@ -2,6 +2,8 @@
 # Spec PyInstaller pour macOS (doit être exécuté sur un Mac, ex. via GitHub Actions).
 # Équivalent de AquaBioScope.spec (Windows) mais produit une app bundle .app avec icône .icns.
 
+from aquabioscope import __version__
+
 a = Analysis(
     ['run_aquabioscope.py'],
     pathex=[],
@@ -56,7 +58,7 @@ app = BUNDLE(
     info_plist={
         'CFBundleName': 'AquaBioScope',
         'CFBundleDisplayName': 'AquaBioScope',
-        'CFBundleShortVersionString': '0.1.0',
+        'CFBundleShortVersionString': __version__,
         'NSHighResolutionCapable': True,
         'NSHumanReadableCopyright': 'AquaBioScope',
     },

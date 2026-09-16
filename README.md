@@ -21,18 +21,30 @@ python -m venv .venv
 
 Le résultat est généré dans `dist\AquaBioScope\` (à distribuer en entier, voir `GUIDE_UTILISATION.md`).
 
-## Compilation des applications macOS et Linux
+## Publier une nouvelle version
+
+1. Monter le numéro dans `src/aquabioscope/__init__.py` (`__version__ = "x.y.z"`) — c'est la seule
+   source de vérité, `pyproject.toml` la lit dynamiquement.
+2. Commiter, puis taguer et pousser le tag :
+   ```powershell
+   git tag vx.y.z
+   git push origin vx.y.z
+   ```
+3. Le tag déclenche `.github/workflows/build.yml`, qui compile **Windows, macOS (Intel +
+   Apple Silicon) et Linux**, et publie les 4 fichiers sur une **Release GitHub** correspondant au
+   tag.
+4. La page de téléchargement (`site/index.html`) va chercher toute seule (en JavaScript, au
+   chargement) la dernière Release via l'API GitHub : version affichée et liens de téléchargement
+   se mettent à jour automatiquement, sans ré-upload FTP des exécutables.
+
+Le workflow peut aussi être lancé manuellement (onglet *Actions* du dépôt, bouton *Run workflow*) ;
+dans ce cas il compile les 3 plateformes en artefacts téléchargeables, mais ne publie pas de
+Release (seul un tag `v*` le fait).
+
+## Compilation manuelle macOS / Linux
 
 PyInstaller ne fait pas de cross-compilation : impossible de générer une app macOS ou Linux depuis
-Windows. La compilation se fait automatiquement via GitHub Actions (`.github/workflows/build.yml`),
-déclenchée manuellement (onglet *Actions* du dépôt, bouton *Run workflow*) ou à la création d'un
-tag `v*`. Elle produit :
-
-- `AquaBioScope-macos-intel.zip` et `AquaBioScope-macos-apple-silicon.zip` (app macOS)
-- `AquaBioScope-linux-x86_64.AppImage` (exécutable Linux portable, aucune installation requise)
-
-téléchargeables comme artefacts du run, ou attachés automatiquement à la Release si déclenchée par
-un tag.
+Windows, il faut un vrai Mac / une vraie machine Linux (ou passer par le workflow CI ci-dessus).
 
 Pour compiler manuellement sur un vrai Mac :
 

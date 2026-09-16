@@ -8,6 +8,7 @@ from pathlib import Path
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget
 
+from aquabioscope import __version__
 from aquabioscope.imaging.color import CustomPresetParams
 from aquabioscope.imaging.loader import load_rgb, make_thumbnail
 from aquabioscope.session import DiveSession
@@ -25,7 +26,7 @@ REVIEW_THUMB_SIZE = 1600
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("AquaBioScope")
+        self.setWindowTitle(f"AquaBioScope v{__version__}")
         self.resize(1100, 800)
 
         self.session: DiveSession | None = None
