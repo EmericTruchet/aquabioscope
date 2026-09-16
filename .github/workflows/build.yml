@@ -1,0 +1,120 @@
+name: Build macOS et Linux
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-13
+            arch_name: intel
+          - os: macos-14
+            arch_name: apple-silicon
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pyinstaller
+
+      - name: Compilation avec PyInstaller
+        run: pyinstaller AquaBioScope-macos.spec --noconfirm
+
+      - name: Création de l'archive .zip de l'app
+        run: |
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent AquaBioScope.app AquaBioScope-macos-${{ matrix.arch_name }}.zip
+
+      - name: Publication de l'archive comme artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AquaBioScope-macos-${{ matrix.arch_name }}
+          path: dist/AquaBioScope-macos-${{ matrix.arch_name }}.zip
+
+      - name: Ajout au Release GitHub (si déclenché par un tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/AquaBioScope-macos-${{ matrix.arch_name }}.zip
+
+  build-linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installation des dépendances système (Qt/PySide6)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libegl1 libgl1 libopengl0 libxkbcommon0 libxkbcommon-x11-0 \
+            libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+            libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 \
+            libxcb-xfixes0 libdbus-1-3 libfontconfig1 fuse
+
+      - name: Installation des dépendances Python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pyinstaller
+
+      - name: Compilation avec PyInstaller
+        run: pyinstaller AquaBioScope-linux.spec --noconfirm
+
+      - name: Assemblage de l'AppDir
+        run: |
+          mkdir -p AppDir/usr/bin
+          cp -r dist/AquaBioScope/* AppDir/usr/bin/
+          cp branding/app-icon-256.png AppDir/AquaBioScope.png
+          cat > AppDir/AquaBioScope.desktop <<EOF
+          [Desktop Entry]
+          Name=AquaBioScope
+          Exec=AquaBioScope
+          Icon=AquaBioScope
+          Type=Application
+          Categories=Graphics;
+          EOF
+          cat > AppDir/AppRun <<'EOF'
+          #!/bin/sh
+          HERE="$(dirname "$(readlink -f "${0}")")"
+          exec "${HERE}/usr/bin/AquaBioScope" "$@"
+          EOF
+          chmod +x AppDir/AppRun
+
+      - name: Création de l'AppImage
+        run: |
+          wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+          chmod +x appimagetool
+          ./appimagetool --appimage-extract-and-run AppDir dist/AquaBioScope-linux-x86_64.AppImage
+
+      - name: Publication de l'AppImage comme artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AquaBioScope-linux-x86_64
+          path: dist/AquaBioScope-linux-x86_64.AppImage
+
+      - name: Ajout au Release GitHub (si déclenché par un tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/AquaBioScope-linux-x86_64.AppImage

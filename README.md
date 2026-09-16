@@ -21,14 +21,18 @@ python -m venv .venv
 
 Le résultat est généré dans `dist\AquaBioScope\` (à distribuer en entier, voir `GUIDE_UTILISATION.md`).
 
-## Compilation de l'application macOS
+## Compilation des applications macOS et Linux
 
-PyInstaller ne fait pas de cross-compilation : impossible de générer une app macOS depuis Windows.
-La compilation se fait automatiquement sur des machines macOS via GitHub Actions
-(`.github/workflows/build-macos.yml`), déclenchée manuellement (onglet *Actions* du dépôt,
-bouton *Run workflow*) ou à la création d'un tag `v*`. Elle produit deux archives
-(`AquaBioScope-macos-intel.zip` et `AquaBioScope-macos-apple-silicon.zip`) téléchargeables comme
-artefacts du run, ou attachées automatiquement à la Release si déclenchée par un tag.
+PyInstaller ne fait pas de cross-compilation : impossible de générer une app macOS ou Linux depuis
+Windows. La compilation se fait automatiquement via GitHub Actions (`.github/workflows/build.yml`),
+déclenchée manuellement (onglet *Actions* du dépôt, bouton *Run workflow*) ou à la création d'un
+tag `v*`. Elle produit :
+
+- `AquaBioScope-macos-intel.zip` et `AquaBioScope-macos-apple-silicon.zip` (app macOS)
+- `AquaBioScope-linux-x86_64.AppImage` (exécutable Linux portable, aucune installation requise)
+
+téléchargeables comme artefacts du run, ou attachés automatiquement à la Release si déclenchée par
+un tag.
 
 Pour compiler manuellement sur un vrai Mac :
 
@@ -41,6 +45,18 @@ python3 -m venv .venv
 Le résultat est `dist/AquaBioScope.app`. L'app n'étant pas signée par un compte développeur Apple
 (payant), macOS affichera un avertissement « développeur non identifié » au premier lancement :
 l'utilisateur doit faire clic droit → *Ouvrir* → *Ouvrir* (une seule fois).
+
+Pour compiler manuellement sur Linux (voir `.github/workflows/build.yml` pour l'assemblage complet
+en AppImage) :
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -e . pyinstaller
+.venv/bin/pyinstaller AquaBioScope-linux.spec --noconfirm
+```
+
+Le résultat est le dossier `dist/AquaBioScope/` (à distribuer en entier), ou l'AppImage produite
+par le workflow pour un fichier unique portable.
 
 ## Tests
 
