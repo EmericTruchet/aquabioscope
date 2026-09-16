@@ -30,20 +30,17 @@ jobs:
       - name: Compilation avec PyInstaller
         run: pyinstaller AquaBioScope.spec --noconfirm
 
-      - name: Création de l'archive .zip
-        run: Compress-Archive -Path dist/AquaBioScope.exe -DestinationPath dist/AquaBioScope-windows.zip
-
-      - name: Publication de l'archive comme artefact
+      - name: Publication de l'exe comme artefact
         uses: actions/upload-artifact@v4
         with:
           name: AquaBioScope-windows
-          path: dist/AquaBioScope-windows.zip
+          path: dist/AquaBioScope.exe
 
       - name: Ajout au Release GitHub (si déclenché par un tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/AquaBioScope-windows.zip
+          files: dist/AquaBioScope.exe
 
   build-macos:
     # macOS Apple Silicon uniquement : Apple ne vend plus de Mac Intel depuis
