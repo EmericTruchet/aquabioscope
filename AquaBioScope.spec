@@ -30,7 +30,11 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    # UPX desactive : la compression UPX est aussi tres utilisee par les
+    # malwares pour se dissimuler, ce qui declenche des faux positifs
+    # frequents ("Virus detecte") sur Windows Defender/SmartScreen pour un
+    # executable non signe comme celui-ci.
+    upx=False,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
