@@ -14,6 +14,9 @@ site/AquaBioScope.exe
 site/AquaBioScope-*.zip
 site/AquaBioScope-*.AppImage
 
+# Sorties intermediaires des scripts de collecte d'especes (voir scripts/species_db)
+scripts/species_db/out_*.csv
+
 # Dossiers de travail utilisateur (entree/sortie de session, non versionnes)
 /input/
 /output/

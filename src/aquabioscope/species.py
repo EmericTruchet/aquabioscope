@@ -133,14 +133,20 @@ class SpeciesCatalog:
                 e, vern_norm, sci_norm, _singularize(vern_norm), _singularize(sci_norm), candidates
             ))
 
+    _MIN_REGION_COVERAGE = 0.1  # part minimale de la base a couvrir pour qu'un filtre region soit fiable
+
     def for_region(self, region: str | None) -> list[SpeciesEntry]:
-        """Filtre par region si la base couvre cette region, sinon renvoie
-        tout (la base ne couvre aujourd'hui que Mediterranee/Atlantique ;
-        mieux vaut proposer toute la base que rien pour les autres zones)."""
+        """Filtre par region si la base couvre reellement cette region (au
+        moins _MIN_REGION_COVERAGE de la base taguee), sinon renvoie tout :
+        certaines zones n'ont que quelques especes taguees (ex. tetrapodes
+        marins curates a la main) et mieux vaut proposer toute la base que
+        quasiment rien pour ces zones-la."""
         if not region:
             return list(self.entries)
         filtered = [e for e in self.entries if region in e.regions]
-        return filtered or list(self.entries)
+        if len(filtered) < self._MIN_REGION_COVERAGE * len(self.entries):
+            return list(self.entries)
+        return filtered
 
     def search(self, query: str, region: str | None = None, limit: int = 30) -> list[SpeciesEntry]:
         region_set = None if not region else set(self.for_region(region))

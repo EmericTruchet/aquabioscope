@@ -15,6 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 build = ["pyinstaller>=6.0"]
+species-db = ["requests>=2.31"]
 
 [project.scripts]
 aquabioscope = "aquabioscope.app:main"

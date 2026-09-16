@@ -1,0 +1,50 @@
+embranchement,nom_vernaculaire,nom_scientifique,regions
+Tétrapode,Grand dauphin,Tursiops truncatus,"atlantique,mediterranee,caraibes,indo-pacifique,mer-rouge,ocean-indien,pacifique"
+Tétrapode,Dauphin bleu et blanc,Stenella coeruleoalba,"mediterranee,atlantique"
+Tétrapode,Dauphin commun,Delphinus delphis,"mediterranee,atlantique,pacifique"
+Tétrapode,Cachalot,Physeter macrocephalus,"mediterranee,atlantique,pacifique,ocean-indien"
+Tétrapode,Rorqual commun,Balaenoptera physalus,"mediterranee,atlantique,pacifique"
+Tétrapode,Petit rorqual,Balaenoptera acutorostrata,"atlantique,pacifique,mediterranee"
+Tétrapode,Rorqual bleu,Balaenoptera musculus,"atlantique,pacifique,ocean-indien"
+Tétrapode,Baleine à bosse,Megaptera novaeangliae,"atlantique,pacifique,ocean-indien,caraibes,indo-pacifique"
+Tétrapode,Baleine grise,Eschrichtius robustus,pacifique
+Tétrapode,Baleine franche de l'Atlantique Nord,Eubalaena glacialis,atlantique
+Tétrapode,Baleine franche australe,Eubalaena australis,"pacifique,ocean-indien,atlantique"
+Tétrapode,Orque,Orcinus orca,"atlantique,pacifique,ocean-indien,mediterranee"
+Tétrapode,Globicéphale noir,Globicephala melas,"atlantique,mediterranee"
+Tétrapode,Globicéphale tropical,Globicephala macrorhynchus,"caraibes,indo-pacifique,pacifique,ocean-indien"
+Tétrapode,Dauphin de Risso,Grampus griseus,"mediterranee,atlantique,pacifique"
+Tétrapode,Marsouin commun,Phocoena phocoena,"atlantique,mediterranee"
+Tétrapode,Dauphin à long bec,Stenella longirostris,"caraibes,indo-pacifique,pacifique,ocean-indien,mer-rouge"
+Tétrapode,Dauphin tacheté pantropical,Stenella attenuata,"caraibes,indo-pacifique,pacifique,ocean-indien"
+Tétrapode,Sténo rostré,Steno bredanensis,"caraibes,indo-pacifique,pacifique"
+Tétrapode,Dauphin à bosse de l'Indo-Pacifique,Sousa chinensis,"indo-pacifique,ocean-indien"
+Tétrapode,Baleine à bec de Cuvier,Ziphius cavirostris,"mediterranee,atlantique,pacifique"
+Tétrapode,Béluga,Delphinapterus leucas,"atlantique,pacifique"
+Tétrapode,Narval,Monodon monoceros,atlantique
+Tétrapode,Phoque gris,Halichoerus grypus,atlantique
+Tétrapode,Phoque veau-marin,Phoca vitulina,"atlantique,pacifique"
+Tétrapode,Phoque moine de Méditerranée,Monachus monachus,"mediterranee,atlantique"
+Tétrapode,Phoque moine d'Hawaï,Neomonachus schauinslandi,pacifique
+Tétrapode,Phoque léopard,Hydrurga leptonyx,"pacifique,ocean-indien,atlantique"
+Tétrapode,Phoque de Weddell,Leptonychotes weddellii,"pacifique,ocean-indien,atlantique"
+Tétrapode,Otarie à fourrure d'Afrique du Sud,Arctocephalus pusillus,"ocean-indien,atlantique"
+Tétrapode,Otarie à fourrure d'Amérique du Sud,Arctocephalus australis,"atlantique,pacifique"
+Tétrapode,Otarie de Californie,Zalophus californianus,pacifique
+Tétrapode,Morse,Odobenus rosmarus,"atlantique,pacifique"
+Tétrapode,Lion de mer d'Australie,Neophoca cinerea,"indo-pacifique,pacifique"
+Tétrapode,Dugong,Dugong dugon,"indo-pacifique,ocean-indien,mer-rouge,pacifique"
+Tétrapode,Lamantin des Caraïbes,Trichechus manatus,"caraibes,atlantique"
+Tétrapode,Lamantin d'Afrique,Trichechus senegalensis,atlantique
+Tétrapode,Tortue caouanne,Caretta caretta,"atlantique,mediterranee"
+Tétrapode,Tortue verte,Chelonia mydas,"mediterranee,atlantique,caraibes,indo-pacifique,ocean-indien,mer-rouge,pacifique"
+Tétrapode,Tortue luth,Dermochelys coriacea,"atlantique,mediterranee,caraibes,pacifique,ocean-indien"
+Tétrapode,Tortue imbriquée,Eretmochelys imbricata,"caraibes,indo-pacifique,ocean-indien,mer-rouge,pacifique"
+Tétrapode,Tortue olivâtre,Lepidochelys olivacea,"indo-pacifique,ocean-indien,pacifique,atlantique"
+Tétrapode,Tortue de Kemp,Lepidochelys kempii,"caraibes,atlantique"
+Tétrapode,Tortue à dos plat,Natator depressus,"indo-pacifique,pacifique"
+Tétrapode,Tricot rayé,Laticauda colubrina,"indo-pacifique,pacifique,ocean-indien"
+Tétrapode,Serpent marin à ventre jaune,Hydrophis platurus,"indo-pacifique,pacifique,ocean-indien"
+Tétrapode,Serpent marin olivâtre,Aipysurus laevis,"indo-pacifique,pacifique"
+Tétrapode,Iguane marin des Galápagos,Amblyrhynchus cristatus,pacifique
+Tétrapode,Crocodile marin,Crocodylus porosus,"indo-pacifique,pacifique,ocean-indien"

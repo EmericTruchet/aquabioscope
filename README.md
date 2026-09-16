@@ -2,7 +2,7 @@
 
 # AquaBioScope
 
-Logiciel de retouche colorimétrique, renommage en masse et tag d'espèces pour photos de plongée sous-marine (Méditerranée / Atlantique), destiné à être distribué comme exécutable Windows autonome.
+Logiciel de retouche colorimétrique, renommage en masse et tag d'espèces pour photos de plongée sous-marine dans le monde entier, destiné à être distribué comme exécutable autonome (Windows, macOS, Linux).
 
 ## Développement
 
@@ -66,4 +66,4 @@ par le workflow pour un fichier unique portable.
 
 ## État du projet
 
-Pipeline complet fonctionnel : accueil (dossiers, lieu, date, zone, crédit) → revue colorimétrique (3 presets + original) → tags d'espèces (base Méditerranée/Atlantique) → export (retouche pleine résolution, crédit incrusté, renommage, EXIF, inventaire Excel) → compilation en exécutable Windows autonome.
+Pipeline complet fonctionnel : accueil (dossiers, lieu, date, zone, crédit) → revue colorimétrique (3 presets + original) → tags d'espèces (base mondiale, 5300+ espèces) → export (retouche pleine résolution, crédit incrusté, renommage, EXIF, inventaire Excel) → compilation en exécutable Windows/macOS/Linux.
