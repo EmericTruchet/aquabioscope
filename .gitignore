@@ -8,11 +8,10 @@ dist/
 AppDir/
 appimagetool
 *.AppImage
-# Binaires compiles copies dans site/ pour la page de telechargement
-# (generes, pas du code source ; a redeposer manuellement avant deploiement).
-site/AquaBioScope.exe
-site/AquaBioScope-*.zip
-site/AquaBioScope-*.AppImage
+
+# Page de telechargement : geree hors depot (uploadee par FTP separement),
+# pas de suivi git pour ce dossier.
+/site/
 
 # Sorties intermediaires des scripts de collecte d'especes (voir scripts/species_db)
 scripts/species_db/out_*.csv
