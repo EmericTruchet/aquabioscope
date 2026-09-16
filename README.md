@@ -1,3 +1,5 @@
+<p align="center"><img src="branding/logo-full.png" width="240" alt="Logo AquaBioScope"></p>
+
 # AquaBioScope
 
 Logiciel de retouche colorimétrique, renommage en masse et tag d'espèces pour photos de plongée sous-marine (Méditerranée / Atlantique), destiné à être distribué comme exécutable Windows autonome.
