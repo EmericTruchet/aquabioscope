@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Manifeste du paquet Microsoft Store (MSIX) d'AquaBioScope.
+  Les valeurs entre accolades sont remplies par store/build_msix.ps1 :
+  {IDENTITY_NAME}, {PUBLISHER} et {PUBLISHER_DISPLAY_NAME} viennent de
+  l'espace partenaires Microsoft (Produit > Identité du produit), {VERSION}
+  de aquabioscope.__version__ (format x.y.z.0 impose par le Store).
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <Identity
+    Name="{IDENTITY_NAME}"
+    Publisher="{PUBLISHER}"
+    Version="{VERSION}"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>AquaBioScope</DisplayName>
+    <PublisherDisplayName>{PUBLISHER_DISPLAY_NAME}</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>Retouche colorimétrique, renommage en masse et identification des espèces pour photos de plongée sous-marine.</Description>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="fr-FR" />
+  </Resources>
+
+  <Applications>
+    <Application Id="AquaBioScope" Executable="AquaBioScope.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="AquaBioScope"
+        Description="Photos de plongée : couleurs, renommage et espèces"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\LargeTile.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- Application de bureau classique (PyInstaller) : acces complet aux fichiers choisis par l'utilisateur. -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
