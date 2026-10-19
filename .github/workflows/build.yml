@@ -27,20 +27,40 @@ jobs:
           pip install -e .
           pip install pyinstaller
 
-      - name: Compilation avec PyInstaller
+      - name: Compilation avec PyInstaller (exe portable)
         run: pyinstaller AquaBioScope.spec --noconfirm
 
-      - name: Publication de l'exe comme artefact
+      - name: Compilation avec PyInstaller (dossier, pour l'installateur)
+        run: pyinstaller AquaBioScope-installer.spec --noconfirm
+
+      - name: Création de l'installateur (Inno Setup)
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup -y --no-progress
+          }
+          $version = python -c "import aquabioscope; print(aquabioscope.__version__)"
+          & $iscc "/DAppVersion=$version" installer\AquaBioScope.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Publication des exécutables comme artefact
         uses: actions/upload-artifact@v4
         with:
           name: AquaBioScope-windows
-          path: dist/AquaBioScope.exe
+          path: |
+            dist/AquaBioScope.exe
+            dist/AquaBioScope-Setup.exe
 
       - name: Ajout au Release GitHub (si déclenché par un tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/AquaBioScope.exe
+          # AquaBioScope-Setup.exe : nom attendu par la mise a jour
+          # automatique (aquabioscope.updater.INSTALLER_ASSET), ne pas le changer.
+          files: |
+            dist/AquaBioScope.exe
+            dist/AquaBioScope-Setup.exe
 
   build-macos:
     # macOS Apple Silicon uniquement : Apple ne vend plus de Mac Intel depuis

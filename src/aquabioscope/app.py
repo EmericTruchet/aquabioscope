@@ -6,7 +6,7 @@ from importlib import resources
 from pathlib import Path
 
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget, QVBoxLayout, QWidget
 
 from aquabioscope import __version__
 from aquabioscope.imaging.color import CustomPresetParams
@@ -20,6 +20,7 @@ from aquabioscope.ui.onboarding import OnboardingWidget
 from aquabioscope.ui.review import ReviewWidget
 from aquabioscope.ui.species_tagging import SpeciesTagWidget
 from aquabioscope.ui.theme import STYLESHEET
+from aquabioscope.ui.update_banner import UpdateBanner
 
 REVIEW_THUMB_SIZE = 1600
 
@@ -41,7 +42,14 @@ class MainWindow(QMainWindow):
         self.species_catalog = SpeciesCatalog()
 
         self.stack = QStackedWidget()
-        self.setCentralWidget(self.stack)
+        self.update_banner = UpdateBanner()
+        central = QWidget()
+        central_layout = QVBoxLayout(central)
+        central_layout.setContentsMargins(0, 0, 0, 0)
+        central_layout.setSpacing(0)
+        central_layout.addWidget(self.update_banner)
+        central_layout.addWidget(self.stack, stretch=1)
+        self.setCentralWidget(central)
 
         self.onboarding = OnboardingWidget()
         self.onboarding.session_ready.connect(self._on_session_ready)
@@ -174,6 +182,7 @@ def main() -> None:
     app.setWindowIcon(QIcon(str(icon_path)))
     window = MainWindow()
     window.show()
+    window.update_banner.start_check()
     sys.exit(app.exec())
 
 

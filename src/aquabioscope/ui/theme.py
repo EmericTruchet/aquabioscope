@@ -101,6 +101,16 @@ QWidget#GalleryThumb[selected="true"] QLabel#ThumbCaption {{
     font-weight: 600;
 }}
 
+QWidget#UpdateBanner {{
+    background: {ACCENT_SOFT};
+    border-bottom: 1px solid {BORDER};
+}}
+QWidget#UpdateBanner QLabel {{
+    background: transparent;
+    color: {ACCENT_DARKER};
+    font-weight: 600;
+}}
+
 QLabel#HintBar {{
     color: {TEXT_SECONDARY};
     font-size: 12px;
