@@ -5,7 +5,10 @@ from tempfile import TemporaryDirectory
 
 import numpy as np
 
-from aquabioscope.export import build_filename, draw_credit, export_photo, slugify
+import piexif
+from PIL import Image
+
+from aquabioscope.export import build_exif_bytes, build_filename, draw_credit, export_photo, slugify
 
 
 class ExportTest(unittest.TestCase):
@@ -49,6 +52,19 @@ class ExportTest(unittest.TestCase):
             )
             self.assertTrue(result.output_path.exists())
             self.assertEqual(result.output_path.name, "Merou-brun_Cap-de-creus_20260907_0001.jpg")
+
+    def test_exif_with_huge_maker_note_still_fits_in_a_jpeg(self) -> None:
+        # Certains appareils (Olympus TG) ecrivent des notes constructeur
+        # proches de la limite du segment EXIF d'un JPEG (64 Ko) : l'ajout des
+        # mots-cles especes la faisait depasser.
+        with TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.jpg"
+            exif = {"0th": {piexif.ImageIFD.Model: b"TG-6"}, "Exif": {piexif.ExifIFD.MakerNote: b"x" * 65440},
+                    "GPS": {}, "1st": {}}
+            Image.new("RGB", (8, 8)).save(source, exif=piexif.dump(exif))
+            exif_bytes = build_exif_bytes(source, "Riou", ["Chapon"])
+            Image.new("RGB", (8, 8)).save(Path(tmp) / "out.jpg", exif=exif_bytes)  # levait "EXIF data is too long"
+            self.assertEqual(piexif.load(exif_bytes)["0th"][piexif.ImageIFD.Model], b"TG-6")
 
 
 if __name__ == "__main__":

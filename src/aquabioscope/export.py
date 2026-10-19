@@ -11,6 +11,7 @@ import piexif
 from PIL import Image, ImageDraw, ImageFont
 
 JPEG_QUALITY = 92
+_MAX_EXIF_BYTES = 65000  # limite du segment EXIF d'un JPEG (64 Ko), marge comprise
 _FONT_CANDIDATES = ["arial.ttf", "DejaVuSans.ttf"]
 
 
@@ -89,7 +90,15 @@ def build_exif_bytes(source_path: Path, dive_site: str, species_names: list[str]
     exif_dict["0th"][0x9C9B] = _xp_keywords_bytes([dive_site, *species_names])  # XPKeywords (Windows)
     exif_dict.pop("thumbnail", None)
     try:
-        return piexif.dump(exif_dict)
+        exif_bytes = piexif.dump(exif_dict)
+        if len(exif_bytes) > _MAX_EXIF_BYTES:
+            # Notes constructeur (MakerNote) volumineuses, ex. Olympus : le
+            # JPEG limite l'EXIF a 64 Ko, on les retire (le reste est garde).
+            exif_dict.get("Exif", {}).pop(piexif.ExifIFD.MakerNote, None)
+            exif_bytes = piexif.dump(exif_dict)
+        if len(exif_bytes) > _MAX_EXIF_BYTES:
+            raise ValueError("EXIF trop volumineux")
+        return exif_bytes
     except Exception:
         # Si des tags impossibles a re-encoder trainent dans l'EXIF source
         # (frequent avec certains firmwares), on repart d'un EXIF minimal.
