@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
 from aquabioscope.custom_presets_store import load_named_presets, save_named_presets
 from aquabioscope.imaging.color import PRESETS, apply_custom_preset
 from aquabioscope.imaging.crop import CropRect, apply_crop
+from aquabioscope.imaging.loader import make_thumbnail
 from aquabioscope.ui.crop_dialog import CropDialog
 from aquabioscope.ui.custom_preset_dialog import CustomPresetDialog
 
@@ -31,8 +32,14 @@ _TILES: list[tuple[str, str]] = [
     ("original", "Original"),
     ("naturel", "Naturel"),
     ("profondeur", "Corrigé profondeur"),
-    ("macro", "Macro contraste"),
+    ("macro", "Macro / flash"),
+    ("vert", "Eau verte"),
+    ("nb", "Noir & blanc"),
 ]
+# Les vignettes de la galerie sont calculees sur une image reduite (quasi
+# instantane) ; seul le preset affiche en grand est calcule a la taille de
+# l'apercu, a la demande, puis garde en cache pour la photo en cours.
+GALLERY_RENDER_SIZE = 320
 DEFAULT_PRESET = "naturel"
 
 
@@ -267,7 +274,7 @@ class ReviewWidget(QWidget):
         self._current_thumb: np.ndarray | None = None  # apercu recadre (= celui affiche)
         self._crop: CropRect | None = None
         self._previous_crop: CropRect | None = None
-        self._versions: dict[str, QPixmap] = {}
+        self._versions: dict[str, QPixmap] = {}  # cle -> apercu grand format (calcule a la demande)
         self._selected_key = DEFAULT_PRESET
         self._named_presets = load_named_presets()
 
@@ -308,7 +315,7 @@ class ReviewWidget(QWidget):
 
         hint = QLabel(
             "Clique sur l'aperçu (ou Entrée) pour valider  •  molette pour zoomer, glisser pour se déplacer, "
-            "double-clic pour réinitialiser  •  1-4 pour les presets fixes  •  "
+            "double-clic pour réinitialiser  •  1-6 pour les presets fixes  •  "
             "C pour recadrer  •  clic droit sur un preset personnalisé pour le supprimer  •  "
             "Suppr pour écarter la photo"
         )
@@ -369,7 +376,7 @@ class ReviewWidget(QWidget):
         # Choix "maintenu" : on garde le dernier preset choisi comme point de
         # depart pour la photo suivante (souvent la meme lumiere/scene), sauf
         # s'il a ete supprime entre-temps.
-        initial_key = self._selected_key if self._selected_key in self._versions else DEFAULT_PRESET
+        initial_key = self._selected_key if self._is_valid_key(self._selected_key) else DEFAULT_PRESET
         self._select(initial_key)
 
     def _render_versions(self) -> None:
@@ -378,16 +385,20 @@ class ReviewWidget(QWidget):
         self.crop_badge.setVisible(self._crop is not None)
         self.preview.reset_zoom()
 
-        self._versions = {"original": _rgb_to_pixmap(rgb_thumb)}
-        self._thumbs["original"].set_pixmap(self._versions["original"])
-        for key, fn in PRESETS.items():
-            pixmap = _rgb_to_pixmap(fn(rgb_thumb))
-            self._versions[key] = pixmap
-            self._thumbs[key].set_pixmap(pixmap)
-        for name, params in self._named_presets.items():
-            pixmap = _rgb_to_pixmap(apply_custom_preset(rgb_thumb, params))
-            self._versions[name] = pixmap
-            self._thumbs[name].set_pixmap(pixmap)
+        self._versions = {}
+        small = make_thumbnail(rgb_thumb, GALLERY_RENDER_SIZE)
+        for key, thumb in self._thumbs.items():
+            thumb.set_pixmap(_rgb_to_pixmap(self._render(key, small)))
+
+    def _is_valid_key(self, key: str) -> bool:
+        return key in self._thumbs
+
+    def _render(self, key: str, rgb: np.ndarray) -> np.ndarray:
+        if key in PRESETS:
+            return PRESETS[key](rgb)
+        if key in self._named_presets:
+            return apply_custom_preset(rgb, self._named_presets[key])
+        return rgb  # "original"
 
     def _open_crop_dialog(self) -> None:
         if self._full_thumb is None:
@@ -397,12 +408,14 @@ class ReviewWidget(QWidget):
             return
         self._crop = dialog.crop
         self._render_versions()
-        self._select(self._selected_key if self._selected_key in self._versions else DEFAULT_PRESET)
+        self._select(self._selected_key if self._is_valid_key(self._selected_key) else DEFAULT_PRESET)
 
     def _select(self, key: str) -> None:
-        if key not in self._versions:
+        if not self._is_valid_key(key) or self._current_thumb is None:
             return
         self._selected_key = key
+        if key not in self._versions:
+            self._versions[key] = _rgb_to_pixmap(self._render(key, self._current_thumb))
         self.preview.set_source_pixmap(self._versions[key])
         for k, thumb in self._thumbs.items():
             thumb.set_selected(k == key)
@@ -430,9 +443,8 @@ class ReviewWidget(QWidget):
         save_named_presets(self._named_presets)
 
         self._add_named_tile(name)
-        pixmap = _rgb_to_pixmap(apply_custom_preset(self._current_thumb, params))
-        self._versions[name] = pixmap
-        self._thumbs[name].set_pixmap(pixmap)
+        small = make_thumbnail(self._current_thumb, GALLERY_RENDER_SIZE)
+        self._thumbs[name].set_pixmap(_rgb_to_pixmap(apply_custom_preset(small, params)))
         self._select(name)
 
     def _maybe_delete_named(self, name: str) -> None:

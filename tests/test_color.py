@@ -2,8 +2,11 @@ import unittest
 
 import numpy as np
 
+import cv2
+
 from aquabioscope.imaging.color import (
-    PRESETS, CustomPresetParams, apply_custom_preset, gray_world_balance, restore_red_channel,
+    PRESETS, CustomPresetParams, apply_custom_preset, gray_world_balance, preset_naturel,
+    preset_profondeur, restore_red_channel, water_cast,
 )
 
 
@@ -43,6 +46,29 @@ class ColorTest(unittest.TestCase):
                 out = fn(self.rgb_uint8)
                 self.assertEqual(out.shape, self.rgb_uint8.shape)
                 self.assertEqual(out.dtype, np.uint8)
+
+    def test_water_cast_distinguishes_flash_from_blue_water(self) -> None:
+        self.assertGreater(water_cast(self.blue_cast), 0.8)
+        warm = self.blue_cast[..., ::-1].copy()  # rouge dominant, comme au flash
+        self.assertEqual(water_cast(warm), 0.0)
+
+    def test_blue_water_presets_do_not_turn_purple(self) -> None:
+        # Scene d'eau bleue plausible : canaux correles (meme relief), rouge
+        # quasi absorbe - c'est la que les presets v1 viraient au violet.
+        rng = np.random.default_rng(0)
+        relief = cv2.GaussianBlur(rng.uniform(0.3, 1.0, (60, 80)).astype(np.float32), (0, 0), 3)
+        scene = np.stack([0.06 * relief, 0.45 * relief, 0.85 * relief], axis=-1)
+        blue_u8 = (np.clip(scene, 0, 1) * 255).astype(np.uint8)
+
+        def hue(rgb_u8: np.ndarray) -> float:
+            # angle de teinte LAB (degres) : ~-80 bleu, ~-40 violet, ~0 magenta/rouge
+            lab = cv2.cvtColor(rgb_u8.astype(np.float32) / 255, cv2.COLOR_RGB2LAB)
+            return float(np.degrees(np.arctan2(np.median(lab[..., 2]), np.median(lab[..., 1]))))
+
+        before = hue(blue_u8)
+        for fn in (preset_naturel, preset_profondeur):
+            with self.subTest(preset=fn.__name__):
+                self.assertLess(hue(fn(blue_u8)), before + 10)  # pas de rotation vers le violet
 
     def test_apply_custom_preset_returns_valid_image(self) -> None:
         params = CustomPresetParams(red_strength=1.2, gray_balance=0.6, contrast=2.0, sharpen=0.4, saturation=1.3)
