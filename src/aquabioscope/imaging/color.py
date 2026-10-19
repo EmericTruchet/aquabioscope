@@ -6,7 +6,6 @@ d'eau mesurée sur chaque photo :
 - "profondeur" : correction forte + dévoilage, photos en lumière naturelle.
 - "macro"      : contraste, couleurs et netteté pour les photos au flash.
 - "vert"       : eaux vertes (Atlantique, Manche, lacs).
-- "nb"         : noir & blanc contrasté.
 Les presets personnalisés "+" (CustomPresetParams) gardent le moteur v1
 (restore_red_channel, gray_world_balance, CLAHE...) : les réglages déjà
 enregistrés par l'utilisateur rendent exactement comme avant.
@@ -280,23 +279,11 @@ def preset_eau_verte(rgb_uint8: np.ndarray) -> np.ndarray:
     return _to_uint8(vibrance(f, 0.3))
 
 
-def preset_noir_blanc(rgb_uint8: np.ndarray) -> np.ndarray:
-    """Noir & blanc contrasté (mélange de canaux favorisant le rouge, qui
-    éclaircit les sujets et assombrit l'eau)."""
-    f = dehaze(_to_float(rgb_uint8), 0.4)
-    gray = 0.5 * f[..., 0] + 0.35 * f[..., 1] + 0.15 * f[..., 2]
-    g = np.repeat(gray[..., None], 3, axis=2).astype(np.float32)
-    g = stretch_levels(g, 1.0, 0.0, low=0.3, high=99.7)
-    g = finish_lab(g, clarity=0.6, contrast=0.25)
-    return _to_uint8(g)
-
-
 PRESETS: dict[str, Callable[[np.ndarray], np.ndarray]] = {
     "naturel": preset_naturel,
     "profondeur": preset_profondeur,
     "macro": preset_macro,
     "vert": preset_eau_verte,
-    "nb": preset_noir_blanc,
 }
 
 

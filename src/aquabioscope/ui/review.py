@@ -34,7 +34,6 @@ _TILES: list[tuple[str, str]] = [
     ("profondeur", "Corrigé profondeur"),
     ("macro", "Macro / flash"),
     ("vert", "Eau verte"),
-    ("nb", "Noir & blanc"),
 ]
 # Les vignettes de la galerie sont calculees sur une image reduite (quasi
 # instantane) ; seul le preset affiche en grand est calcule a la taille de
@@ -315,7 +314,7 @@ class ReviewWidget(QWidget):
 
         hint = QLabel(
             "Clique sur l'aperçu (ou Entrée) pour valider  •  molette pour zoomer, glisser pour se déplacer, "
-            "double-clic pour réinitialiser  •  1-6 pour les presets fixes  •  "
+            "double-clic pour réinitialiser  •  1-5 pour les presets fixes  •  "
             "C pour recadrer  •  clic droit sur un preset personnalisé pour le supprimer  •  "
             "Suppr pour écarter la photo"
         )
