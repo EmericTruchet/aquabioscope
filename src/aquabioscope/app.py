@@ -79,7 +79,7 @@ class MainWindow(QMainWindow):
 
     def _load_current_photo(self) -> None:
         path = self.photos[self.current_index]
-        rgb = load_rgb(path)
+        rgb = load_rgb(path, preview=True)
         self._current_thumb = make_thumbnail(rgb, max_size=REVIEW_THUMB_SIZE)
         self.review.show_photo(path, self._current_thumb, self.current_index, len(self.photos))
 
