@@ -1,13 +1,13 @@
 """Base d'espèces (faune/flore) pour le tag des photos de plongée.
 
-La base embarquée (`data/species.csv`, ~2170 espèces) part d'un inventaire
-réel validé en plongée (Stage Montjoi) complété par les espèces observées
-en Méditerranée et sur la façade Atlantique française (source : API
-iNaturalist, comptages d'observations par taxon, filtrée d'un seuil de
-popularité minimum), plutôt qu'un import brut de toute la biodiversité
-marine (qui compterait des dizaines de milliers de taxons microscopiques
-ou non identifiables en plongée). Le fichier reste un CSV éditable à la
-main, à corriger/compléter au fil des sessions.
+La base embarquée (`data/species.csv`, ~8600 espèces) part d'un inventaire
+réel validé en plongée (Stage Montjoi), complété par les espèces les plus
+observées par les naturalistes (iNaturalist via GBIF) dans chaque zone de
+plongée de l'application, uniquement marines (filtre WoRMS, à l'exception
+de quelques espèces de lac), avec tous leurs noms français connus (GBIF,
+Wikidata, WoRMS) et les noms usuels de plongeurs ("chapon", "mostelle"...).
+Voir scripts/species_db pour la reconstruire. Le fichier reste un CSV
+éditable à la main.
 """
 from __future__ import annotations
 

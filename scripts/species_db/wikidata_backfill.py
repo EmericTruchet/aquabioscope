@@ -21,7 +21,7 @@ from pathlib import Path
 import requests
 
 CATALOG_PATH = Path(__file__).resolve().parents[2] / "src" / "aquabioscope" / "data" / "species.csv"
-FIELDNAMES = ["embranchement", "nom_vernaculaire", "nom_scientifique", "regions"]
+FIELDNAMES = ["embranchement", "nom_vernaculaire", "nom_scientifique", "regions", "autres_noms"]
 SPARQL_URL = "https://query.wikidata.org/sparql"
 BATCH_SIZE = 80
 
@@ -98,7 +98,7 @@ def main() -> None:
     with args.catalog.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows({k: r.get(k, "") for k in FIELDNAMES} for r in rows)
     print(f"Ecrit dans {args.catalog}")
 
 

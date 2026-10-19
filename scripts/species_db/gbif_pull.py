@@ -35,7 +35,7 @@ from pathlib import Path
 import requests
 
 API = "https://api.gbif.org/v1"
-FIELDNAMES = ["embranchement", "nom_vernaculaire", "nom_scientifique", "regions"]
+FIELDNAMES = ["embranchement", "nom_vernaculaire", "nom_scientifique", "regions", "autres_noms"]
 
 
 def fetch_top_species(session: requests.Session, taxon_key: int, top: int, min_count: int) -> list[tuple[int, int]]:
@@ -129,6 +129,7 @@ def main() -> None:
                 "nom_vernaculaire": vernacular or sci_name,
                 "nom_scientifique": sci_name,
                 "regions": "",
+                "autres_noms": "",
             }
         )
         if i % 25 == 0:

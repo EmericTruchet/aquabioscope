@@ -19,3 +19,7 @@ scripts/species_db/out_*.csv
 # Dossiers de travail utilisateur (entree/sortie de session, non versionnes)
 /input/
 /output/
+
+# Cache de reprise de regional_pull.py
+scripts/species_db/cache_*.json
+scripts/species_db/*_log.txt
