@@ -31,7 +31,11 @@ Le résultat est généré dans `dist\AquaBioScope\` (à distribuer en entier, v
    git push origin vx.y.z
    ```
 3. Le tag déclenche `.github/workflows/build.yml`, qui compile **Windows, macOS (Apple Silicon)
-   et Linux**, et publie les 3 fichiers sur une **Release GitHub** correspondant au tag. (Pas de
+   et Linux**, et publie les fichiers sur une **Release GitHub** correspondant au tag. Pour
+   Windows : l'exe portable `AquaBioScope.exe` et l'installateur `AquaBioScope-Setup.exe`
+   (Inno Setup, `installer/AquaBioScope.iss`). Les applications déjà installées avec ce dernier
+   proposent la mise à jour d'elles-mêmes au démarrage (`src/aquabioscope/updater.py`, qui
+   cherche un fichier nommé exactement `AquaBioScope-Setup.exe` dans la dernière Release). (Pas de
    build macOS Intel : Apple n'en vend plus depuis 2023, et GitHub ne propose plus de runner Intel
    gratuit — l'alternative payante n'a pas été retenue.)
 4. La page de téléchargement (`site/index.html`) va chercher toute seule (en JavaScript, au
@@ -41,6 +45,10 @@ Le résultat est généré dans `dist\AquaBioScope\` (à distribuer en entier, v
 Le workflow peut aussi être lancé manuellement (onglet *Actions* du dépôt, bouton *Run workflow*) ;
 dans ce cas il compile les 3 plateformes en artefacts téléchargeables, mais ne publie pas de
 Release (seul un tag `v*` le fait).
+
+## Microsoft Store
+
+Paquet MSIX et étapes de publication : voir `store/README.md`.
 
 ## Compilation manuelle macOS / Linux
 
