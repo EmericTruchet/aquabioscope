@@ -7,7 +7,8 @@ de basculer sur l'original, un preset fixe, ou un preset personnalisé
 nommé (créé via la tuile "+", conservé d'une session à l'autre — voir
 aquabioscope.custom_presets_store). Valider (clic sur l'aperçu, bouton, ou
 Entrée) passe à la photo suivante ; Supprimer (bouton ou touche Suppr)
-écarte la photo.
+écarte la photo. Recadrer (bouton ou touche C) ouvre le dialogue de
+recadrage ; l'aperçu et les vignettes montrent alors la photo recadrée.
 """
 from __future__ import annotations
 
@@ -22,6 +23,8 @@ from PySide6.QtWidgets import (
 
 from aquabioscope.custom_presets_store import load_named_presets, save_named_presets
 from aquabioscope.imaging.color import PRESETS, apply_custom_preset
+from aquabioscope.imaging.crop import CropRect, apply_crop
+from aquabioscope.ui.crop_dialog import CropDialog
 from aquabioscope.ui.custom_preset_dialog import CustomPresetDialog
 
 _TILES: list[tuple[str, str]] = [
@@ -255,12 +258,15 @@ class _AddPresetTile(QWidget):
 class ReviewWidget(QWidget):
     """Affiche une photo : grand aperçu du preset retenu + galerie pour en changer."""
 
-    choice_made = Signal(str, object)  # (chemin photo, cle/preset choisi ou None si supprime)
+    choice_made = Signal(str, object, object)  # (chemin photo, cle/preset ou None si supprimee, CropRect ou None)
 
     def __init__(self) -> None:
         super().__init__()
         self._current_path: Path | None = None
-        self._current_thumb: np.ndarray | None = None
+        self._full_thumb: np.ndarray | None = None  # apercu non recadre
+        self._current_thumb: np.ndarray | None = None  # apercu recadre (= celui affiche)
+        self._crop: CropRect | None = None
+        self._previous_crop: CropRect | None = None
         self._versions: dict[str, QPixmap] = {}
         self._selected_key = DEFAULT_PRESET
         self._named_presets = load_named_presets()
@@ -275,6 +281,10 @@ class ReviewWidget(QWidget):
         header.addSpacing(12)
         header.addWidget(self.filename_label)
         header.addStretch()
+        self.crop_badge = QLabel("✂ recadrée")
+        self.crop_badge.setObjectName("ProgressBadge")
+        self.crop_badge.hide()
+        header.addWidget(self.crop_badge)
 
         self.preview = _ScalablePreview()
         self.preview.clicked.connect(self._confirm)
@@ -299,7 +309,8 @@ class ReviewWidget(QWidget):
         hint = QLabel(
             "Clique sur l'aperçu (ou Entrée) pour valider  •  molette pour zoomer, glisser pour se déplacer, "
             "double-clic pour réinitialiser  •  1-4 pour les presets fixes  •  "
-            "clic droit sur un preset personnalisé pour le supprimer  •  Suppr pour écarter la photo"
+            "C pour recadrer  •  clic droit sur un preset personnalisé pour le supprimer  •  "
+            "Suppr pour écarter la photo"
         )
         hint.setObjectName("HintBar")
         hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -311,9 +322,14 @@ class ReviewWidget(QWidget):
         self.validate_btn = QPushButton("Valider et continuer  →")
         self.validate_btn.clicked.connect(self._confirm)
 
+        self.crop_btn = QPushButton("✂  Recadrer")
+        self.crop_btn.setObjectName("SecondaryButton")
+        self.crop_btn.clicked.connect(self._open_crop_dialog)
+
         actions = QHBoxLayout()
         actions.addWidget(self.delete_btn)
         actions.addStretch()
+        actions.addWidget(self.crop_btn)
         actions.addWidget(self.validate_btn)
 
         layout = QVBoxLayout(self)
@@ -330,14 +346,37 @@ class ReviewWidget(QWidget):
         QShortcut(QKeySequence(Qt.Key.Key_Return), self, activated=self._confirm)
         QShortcut(QKeySequence(Qt.Key.Key_Enter), self, activated=self._confirm)
         QShortcut(QKeySequence(Qt.Key.Key_Delete), self, activated=self._delete)
+        QShortcut(QKeySequence(Qt.Key.Key_C), self, activated=self._open_crop_dialog)
 
-    def show_photo(self, path: Path, rgb_thumb: np.ndarray, index: int, total: int) -> None:
+    @property
+    def current_thumb(self) -> np.ndarray | None:
+        """Aperçu de la photo en cours, recadré s'il y a lieu."""
+        return self._current_thumb
+
+    def show_photo(
+        self, path: Path, rgb_thumb: np.ndarray, index: int, total: int,
+        crop: CropRect | None = None, previous_crop: CropRect | None = None,
+    ) -> None:
         """Affiche une nouvelle photo (déjà décodée + réduite) avec toutes ses versions."""
         self._current_path = path
-        self._current_thumb = rgb_thumb
-        self.preview.reset_zoom()
+        self._full_thumb = rgb_thumb
+        self._crop = crop
+        self._previous_crop = previous_crop
         self.progress_label.setText(f"Photo {index + 1} / {total}")
         self.filename_label.setText(path.name)
+        self._render_versions()
+
+        # Choix "maintenu" : on garde le dernier preset choisi comme point de
+        # depart pour la photo suivante (souvent la meme lumiere/scene), sauf
+        # s'il a ete supprime entre-temps.
+        initial_key = self._selected_key if self._selected_key in self._versions else DEFAULT_PRESET
+        self._select(initial_key)
+
+    def _render_versions(self) -> None:
+        rgb_thumb = apply_crop(self._full_thumb, self._crop)
+        self._current_thumb = rgb_thumb
+        self.crop_badge.setVisible(self._crop is not None)
+        self.preview.reset_zoom()
 
         self._versions = {"original": _rgb_to_pixmap(rgb_thumb)}
         self._thumbs["original"].set_pixmap(self._versions["original"])
@@ -350,11 +389,15 @@ class ReviewWidget(QWidget):
             self._versions[name] = pixmap
             self._thumbs[name].set_pixmap(pixmap)
 
-        # Choix "maintenu" : on garde le dernier preset choisi comme point de
-        # depart pour la photo suivante (souvent la meme lumiere/scene), sauf
-        # s'il a ete supprime entre-temps.
-        initial_key = self._selected_key if self._selected_key in self._versions else DEFAULT_PRESET
-        self._select(initial_key)
+    def _open_crop_dialog(self) -> None:
+        if self._full_thumb is None:
+            return
+        dialog = CropDialog(self._full_thumb, initial=self._crop, previous=self._previous_crop, parent=self)
+        if dialog.exec() != CropDialog.DialogCode.Accepted:
+            return
+        self._crop = dialog.crop
+        self._render_versions()
+        self._select(self._selected_key if self._selected_key in self._versions else DEFAULT_PRESET)
 
     def _select(self, key: str) -> None:
         if key not in self._versions:
@@ -417,9 +460,9 @@ class ReviewWidget(QWidget):
         if self._current_path is None:
             return
         value = self._named_presets.get(self._selected_key, self._selected_key)
-        self.choice_made.emit(str(self._current_path), value)
+        self.choice_made.emit(str(self._current_path), value, self._crop)
 
     def _delete(self) -> None:
         if self._current_path is None:
             return
-        self.choice_made.emit(str(self._current_path), None)
+        self.choice_made.emit(str(self._current_path), None, None)

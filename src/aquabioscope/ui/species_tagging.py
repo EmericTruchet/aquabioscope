@@ -4,7 +4,8 @@ Recherche avec autocomplétion (nom commun ou scientifique), pré-filtrée
 par la région de la plongée, embranchement affiché pour chaque résultat
 (important en biologie de plongée). Les espèces retenues s'affichent en
 "chips" retirables. Une espèce absente de la base peut être ajoutée en
-texte libre.
+texte libre. Un bouton reprend les espèces de la photo précédente (série
+sur un même sujet), un autre revient au choix du filtre de la photo.
 """
 from __future__ import annotations
 
@@ -55,6 +56,11 @@ class _ResultRow(QWidget):
         sci.setStyleSheet("font-style: italic; color: #5B6B73;")
         layout.addWidget(name)
         layout.addWidget(sci)
+        if entry.autres_noms:
+            others = ", ".join(entry.autres_noms[:3]) + ("…" if len(entry.autres_noms) > 3 else "")
+            aka = QLabel(f"aussi : {others}")
+            aka.setStyleSheet("color: #8A989F;")
+            layout.addWidget(aka)
         layout.addStretch()
 
 
@@ -82,6 +88,7 @@ class _Chip(QWidget):
 
 class SpeciesTagWidget(QWidget):
     tags_confirmed = Signal(str, list)  # (chemin photo, list[SpeciesEntry])
+    back_requested = Signal(list)  # especes deja taguees (brouillon conserve au retour)
 
     def __init__(self, catalog: SpeciesCatalog | None = None) -> None:
         super().__init__()
@@ -90,6 +97,7 @@ class SpeciesTagWidget(QWidget):
         self._current_path: Path | None = None
         self._current_rgb: np.ndarray | None = None
         self._selected: list[SpeciesEntry] = []
+        self._previous: list[SpeciesEntry] = []
 
         self.progress_label = QLabel()
         self.progress_label.setObjectName("ProgressBadge")
@@ -150,17 +158,32 @@ class SpeciesTagWidget(QWidget):
 
         chips_title = QLabel("Espèces taguées sur cette photo :")
         chips_title.setObjectName("FieldLabel")
+        self.same_as_previous_btn = QPushButton("↺  Mêmes espèces que la photo précédente")
+        self.same_as_previous_btn.setObjectName("SecondaryButton")
+        self.same_as_previous_btn.setToolTip("Ajoute les espèces taguées sur la photo précédente (Ctrl+R)")
+        self.same_as_previous_btn.clicked.connect(self._reuse_previous)
+        chips_header = QHBoxLayout()
+        chips_header.addWidget(chips_title)
+        chips_header.addStretch()
+        chips_header.addWidget(self.same_as_previous_btn)
         self.chips_container = QWidget()
         self.chips_layout = FlowLayout(self.chips_container, spacing=8)
         self.chips_container.setMinimumHeight(40)
 
-        hint = QLabel("Entrée ajoute le premier résultat  •  clique une espèce taguée pour la retirer")
+        hint = QLabel(
+            "Entrée ajoute le premier résultat  •  × pour retirer une espèce  •  "
+            "Ctrl+R mêmes espèces que la précédente  •  Échap retour au filtre"
+        )
         hint.setObjectName("HintBar")
         hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.back_btn = QPushButton("←  Retour au filtre")
+        self.back_btn.setObjectName("SecondaryButton")
+        self.back_btn.clicked.connect(self._go_back)
         self.next_btn = QPushButton("Valider les tags et continuer  →")
         self.next_btn.clicked.connect(self._confirm)
         actions = QHBoxLayout()
+        actions.addWidget(self.back_btn)
         actions.addStretch()
         actions.addWidget(self.next_btn)
 
@@ -174,7 +197,7 @@ class SpeciesTagWidget(QWidget):
         right_col = QVBoxLayout()
         right_col.addWidget(title)
         right_col.addLayout(search_row)
-        right_col.addWidget(chips_title)
+        right_col.addLayout(chips_header)
         right_col.addWidget(self.chips_container)
         right_col.addWidget(self.results_list, stretch=1)
 
@@ -192,14 +215,23 @@ class SpeciesTagWidget(QWidget):
         layout.addLayout(actions)
 
         QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Return), self, activated=self._confirm)
+        QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_R), self, activated=self._reuse_previous)
+        QShortcut(QKeySequence(Qt.Key.Key_Escape), self, activated=self._go_back)
 
         self._refresh_results()
 
-    def show_photo(self, path: Path, rgb_thumb: np.ndarray, index: int, total: int, region: str | None) -> None:
+    def show_photo(
+        self, path: Path, rgb_thumb: np.ndarray, index: int, total: int, region: str | None,
+        initial: list[SpeciesEntry] | None = None, previous: list[SpeciesEntry] | None = None,
+    ) -> None:
+        """`initial` : espèces déjà taguées (retour depuis le filtre) ;
+        `previous` : celles de la photo précédente, pour le bouton ↺."""
         self._current_path = path
         self._current_rgb = rgb_thumb
         self.region = region
-        self._selected = []
+        self._selected = list(initial or [])
+        self._previous = list(previous or [])
+        self.same_as_previous_btn.setEnabled(bool(self._previous))
         self.progress_label.setText(f"Photo {index + 1} / {total}")
         self.filename_label.setText(path.name)
         self.lens_hint.setText("")
@@ -213,6 +245,19 @@ class SpeciesTagWidget(QWidget):
         self._rebuild_chips()
         self._refresh_results()
         self.search_edit.setFocus()
+
+    def _reuse_previous(self) -> None:
+        added = [e for e in self._previous if e not in self._selected]
+        if not added:
+            return
+        self._selected.extend(added)
+        self._rebuild_chips()
+        self._refresh_results()
+        self.search_edit.setFocus()
+
+    def _go_back(self) -> None:
+        if self._current_path is not None:
+            self.back_requested.emit(list(self._selected))
 
     def _search_with_google_lens(self) -> None:
         if self._current_rgb is None:

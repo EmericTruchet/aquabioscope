@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWi
 
 from aquabioscope import __version__
 from aquabioscope.imaging.color import CustomPresetParams
+from aquabioscope.imaging.crop import CropRect
 from aquabioscope.imaging.loader import load_rgb, make_thumbnail
 from aquabioscope.session import DiveSession
 from aquabioscope.species import SpeciesCatalog, SpeciesEntry
@@ -34,7 +35,7 @@ class MainWindow(QMainWindow):
         self.current_index = 0
         self.choices: dict[str, str | CustomPresetParams | None] = {}
         self.species_tags: dict[str, list[SpeciesEntry]] = {}
-        self._current_thumb = None
+        self.crops: dict[str, CropRect] = {}
         self.export_worker: ExportWorker | None = None
 
         self.species_catalog = SpeciesCatalog()
@@ -52,6 +53,7 @@ class MainWindow(QMainWindow):
 
         self.species_tag_widget = SpeciesTagWidget(self.species_catalog)
         self.species_tag_widget.tags_confirmed.connect(self._on_tags_confirmed)
+        self.species_tag_widget.back_requested.connect(self._on_back_to_review)
         self.stack.addWidget(self.species_tag_widget)
 
         self.export_progress = ExportProgressWidget()
@@ -66,6 +68,7 @@ class MainWindow(QMainWindow):
         self.current_index = 0
         self.choices = {}
         self.species_tags = {}
+        self.crops = {}
 
         if not self.photos:
             QMessageBox.information(
@@ -80,20 +83,49 @@ class MainWindow(QMainWindow):
     def _load_current_photo(self) -> None:
         path = self.photos[self.current_index]
         rgb = load_rgb(path, preview=True)
-        self._current_thumb = make_thumbnail(rgb, max_size=REVIEW_THUMB_SIZE)
-        self.review.show_photo(path, self._current_thumb, self.current_index, len(self.photos))
+        thumb = make_thumbnail(rgb, max_size=REVIEW_THUMB_SIZE)
+        previous = self._previous_kept_photo()
+        self.review.show_photo(
+            path, thumb, self.current_index, len(self.photos),
+            crop=self.crops.get(str(path)),
+            previous_crop=self.crops.get(str(previous)) if previous else None,
+        )
 
-    def _on_color_choice_made(self, path_str: str, preset_key: object) -> None:
+    def _previous_kept_photo(self) -> Path | None:
+        """Dernière photo gardée (non supprimée) avant la photo en cours."""
+        for path in reversed(self.photos[: self.current_index]):
+            if self.choices.get(str(path)) is not None:
+                return path
+        return None
+
+    def _on_color_choice_made(self, path_str: str, preset_key: object, crop: object) -> None:
         self.choices[path_str] = preset_key  # None => suppression
+        if crop is None:
+            self.crops.pop(path_str, None)
+        else:
+            self.crops[path_str] = crop
         if preset_key is None:
+            # especes eventuellement taguees avant un retour au filtre : hors inventaire
+            self.species_tags.pop(path_str, None)
             self._advance_to_next_photo()
             return
 
         path = self.photos[self.current_index]
         self.species_tag_widget.show_photo(
-            path, self._current_thumb, self.current_index, len(self.photos), self.session.region
+            path, self.review.current_thumb, self.current_index, len(self.photos), self.session.region,
+            initial=self.species_tags.get(path_str), previous=self._previous_photo_species(),
         )
         self.stack.setCurrentWidget(self.species_tag_widget)
+
+    def _previous_photo_species(self) -> list[SpeciesEntry]:
+        previous = self._previous_kept_photo()
+        return self.species_tags.get(str(previous), []) if previous else []
+
+    def _on_back_to_review(self, draft_species: list) -> None:
+        # L'ecran de revue affiche encore cette photo, avec le filtre choisi :
+        # on y revient tel quel, en gardant les especes deja taguees.
+        self.species_tags[str(self.photos[self.current_index])] = draft_species
+        self.stack.setCurrentWidget(self.review)
 
     def _on_tags_confirmed(self, path_str: str, species: list) -> None:
         self.species_tags[path_str] = species
@@ -111,7 +143,7 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentWidget(self.export_progress)
         self.export_progress.set_progress(0, sum(1 for v in self.choices.values() if v is not None), "")
 
-        self.export_worker = ExportWorker(self.session, self.photos, self.choices, self.species_tags)
+        self.export_worker = ExportWorker(self.session, self.photos, self.choices, self.species_tags, self.crops)
         self.export_worker.progress.connect(self.export_progress.set_progress)
         self.export_worker.finished_ok.connect(self._on_export_finished)
         self.export_worker.failed.connect(self._on_export_failed)
@@ -131,6 +163,7 @@ class MainWindow(QMainWindow):
         self.photos = []
         self.choices = {}
         self.species_tags = {}
+        self.crops = {}
         self.stack.setCurrentWidget(self.onboarding)
 
 

@@ -10,6 +10,7 @@ from functools import partial
 
 from aquabioscope.export import export_photo, slugify
 from aquabioscope.imaging.color import PRESETS, CustomPresetParams, apply_custom_preset
+from aquabioscope.imaging.crop import CropRect, apply_crop
 from aquabioscope.imaging.loader import load_rgb
 from aquabioscope.inventory import unique_sorted_species, write_inventory_xlsx
 from aquabioscope.session import DiveSession
@@ -27,12 +28,14 @@ class ExportWorker(QThread):
         photos: list[Path],
         choices: dict[str, str | CustomPresetParams | None],
         species_tags: dict[str, list[SpeciesEntry]],
+        crops: dict[str, CropRect] | None = None,
     ) -> None:
         super().__init__()
         self.session = session
         self.photos = photos
         self.choices = choices
         self.species_tags = species_tags
+        self.crops = crops or {}
 
     def run(self) -> None:
         try:
@@ -53,7 +56,9 @@ class ExportWorker(QThread):
             tags = self.species_tags.get(str(path), [])
             species_names = [e.nom_vernaculaire for e in tags]
 
-            rgb_full = load_rgb(path)
+            # recadrage avant le preset, comme a l'apercu (les corrections
+            # automatiques dependent du contenu de l'image)
+            rgb_full = apply_crop(load_rgb(path), self.crops.get(str(path)))
             export_photo(
                 source_path=path,
                 output_dir=self.session.output_dir,
