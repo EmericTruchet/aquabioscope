@@ -78,10 +78,16 @@ class SpeciesEntry:
     nom_vernaculaire: str
     nom_scientifique: str
     regions: tuple[str, ...]
+    # Autres noms vernaculaires (synonymes, noms usuels de plongeurs : ex.
+    # "chapon" pour Scorpaena scrofa), pris en compte par la recherche.
+    autres_noms: tuple[str, ...] = ()
 
     @property
     def display_label(self) -> str:
         return f"{self.nom_vernaculaire} ({self.nom_scientifique})"
+
+
+ALIAS_SEPARATOR = "|"
 
 
 def _default_csv_path() -> Path:
@@ -94,12 +100,18 @@ def load_species(csv_path: Path | None = None) -> list[SpeciesEntry]:
     with open(path, encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
             regions = tuple(r.strip() for r in row["regions"].split(",") if r.strip())
+            vernaculaire = row["nom_vernaculaire"].strip()
+            aliases = tuple(
+                a.strip() for a in (row.get("autres_noms") or "").split(ALIAS_SEPARATOR)
+                if a.strip() and _normalize(a.strip()) != _normalize(vernaculaire)
+            )
             entries.append(
                 SpeciesEntry(
                     embranchement=row["embranchement"].strip(),
-                    nom_vernaculaire=row["nom_vernaculaire"].strip(),
+                    nom_vernaculaire=vernaculaire,
                     nom_scientifique=row["nom_scientifique"].strip(),
                     regions=regions,
+                    autres_noms=aliases,
                 )
             )
     entries.sort(key=lambda e: (_sort_key(e.embranchement), _normalize(e.nom_vernaculaire)))
@@ -109,29 +121,26 @@ def load_species(csv_path: Path | None = None) -> list[SpeciesEntry]:
 @dataclass(frozen=True)
 class _Indexed:
     entry: SpeciesEntry
-    vern_norm: str
-    sci_norm: str
-    vern_norm_sg: str  # forme "singularisee" (voir _singularize)
-    sci_norm_sg: str
-    fuzzy_candidates: tuple[str, ...]  # nom complet + mots, vernaculaire et scientifique
+    names: tuple[str, ...]     # formes normalisees : vernaculaire, autres noms, scientifique
+    names_sg: tuple[str, ...]  # memes formes "singularisees" (voir _singularize)
+    fuzzy_candidates: tuple[str, ...]  # noms complets + leurs mots
 
 
 class SpeciesCatalog:
-    """Recherche d'espèces (nom vernaculaire ou scientifique), filtrable par
-    région. Les formes normalisées sont pré-calculées à la construction (la
-    base peut compter plusieurs milliers d'entrées, et la recherche est
-    appelée à chaque frappe clavier)."""
+    """Recherche d'espèces (nom vernaculaire, autres noms ou nom
+    scientifique), filtrable par région. Les formes normalisées sont
+    pré-calculées à la construction (la base peut compter plusieurs milliers
+    d'entrées, et la recherche est appelée à chaque frappe clavier)."""
 
     def __init__(self, entries: list[SpeciesEntry] | None = None) -> None:
         self.entries = entries if entries is not None else load_species()
         self._index: list[_Indexed] = []
         for e in self.entries:
-            vern_norm = _normalize(e.nom_vernaculaire)
-            sci_norm = _normalize(e.nom_scientifique)
-            candidates = tuple({vern_norm, sci_norm, *_words(vern_norm), *_words(sci_norm)})
-            self._index.append(_Indexed(
-                e, vern_norm, sci_norm, _singularize(vern_norm), _singularize(sci_norm), candidates
+            names = tuple(dict.fromkeys(
+                _normalize(n) for n in (e.nom_vernaculaire, *e.autres_noms, e.nom_scientifique) if n
             ))
+            candidates = tuple({*names, *(w for n in names for w in _words(n))})
+            self._index.append(_Indexed(e, names, tuple(_singularize(n) for n in names), candidates))
 
     _MIN_REGION_COVERAGE = 0.1  # part minimale de la base a couvrir pour qu'un filtre region soit fiable
 
@@ -140,13 +149,17 @@ class SpeciesCatalog:
         moins _MIN_REGION_COVERAGE de la base taguee), sinon renvoie tout :
         certaines zones n'ont que quelques especes taguees (ex. tetrapodes
         marins curates a la main) et mieux vaut proposer toute la base que
-        quasiment rien pour ces zones-la."""
+        quasiment rien pour ces zones-la.
+
+        Les especes sans aucune region renseignee (recolte mondiale GBIF,
+        repartition inconnue) sont toujours gardees : les exclure masquait
+        des especes bien presentes dans la zone filtree."""
         if not region:
             return list(self.entries)
-        filtered = [e for e in self.entries if region in e.regions]
-        if len(filtered) < self._MIN_REGION_COVERAGE * len(self.entries):
+        tagged = [e for e in self.entries if region in e.regions]
+        if len(tagged) < self._MIN_REGION_COVERAGE * len(self.entries):
             return list(self.entries)
-        return filtered
+        return [e for e in self.entries if region in e.regions or not e.regions]
 
     def search(self, query: str, region: str | None = None, limit: int = 30) -> list[SpeciesEntry]:
         region_set = None if not region else set(self.for_region(region))
@@ -157,27 +170,27 @@ class SpeciesCatalog:
             return [i.entry for i in index[:limit]]
         query_sg = _singularize(query_n)
 
-        starts, contains, seen = [], [], set()
+        # 3 niveaux de pertinence : nom identique a la requete (ex. "chapon"
+        # -> Grande rascasse rouge, via ses autres noms), nom qui commence
+        # par la requete, nom qui la contient.
+        exact, starts, contains, seen = [], [], [], set()
         for i in index:
-            if (
-                i.vern_norm.startswith(query_n) or i.sci_norm.startswith(query_n)
-                or i.vern_norm_sg.startswith(query_sg) or i.sci_norm_sg.startswith(query_sg)
-            ):
+            if query_n in i.names or query_sg in i.names_sg:
+                exact.append(i.entry)
+            elif any(n.startswith(query_n) for n in i.names) or any(n.startswith(query_sg) for n in i.names_sg):
                 starts.append(i.entry)
-                seen.add(i.entry)
-            elif (
-                query_n in i.vern_norm or query_n in i.sci_norm
-                or query_sg in i.vern_norm_sg or query_sg in i.sci_norm_sg
-            ):
+            elif any(query_n in n for n in i.names) or any(query_sg in n for n in i.names_sg):
                 contains.append(i.entry)
-                seen.add(i.entry)
+            else:
+                continue
+            seen.add(i.entry)
 
-        exact = starts + contains
+        matches = exact + starts + contains
         # Le flou n'intervient qu'en dernier recours (aucun resultat exact) :
         # inutile de le declencher si la recherche exacte a deja trouve
         # quelque chose d'utile.
-        if exact or len(query_n) < _FUZZY_MIN_QUERY_LEN:
-            return exact[:limit]
+        if matches or len(query_n) < _FUZZY_MIN_QUERY_LEN:
+            return matches[:limit]
 
         remaining = [i for i in index if i.entry not in seen]
         # 1er passage : la requete entiere (tolere une faute de frappe simple,
@@ -191,7 +204,7 @@ class SpeciesCatalog:
             if sig_words:
                 fuzzy = self._fuzzy_scan(remaining, sig_words)
 
-        return (exact + fuzzy)[:limit]
+        return (matches + fuzzy)[:limit]
 
     @staticmethod
     def _fuzzy_scan(index: list[_Indexed], query_variants: list[str]) -> list[SpeciesEntry]:

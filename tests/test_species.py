@@ -73,6 +73,21 @@ class SpeciesTest(unittest.TestCase):
         results = catalog.search("retepolle cavernicolexx")
         self.assertIn("Reteporella mediterranea", [e.nom_scientifique for e in results])
 
+    def test_search_matches_alternative_names_first(self) -> None:
+        chapon = SpeciesEntry(
+            "Poissons osseux", "Grande rascasse rouge", "Scorpaena scrofa", ("mediterranee",),
+            autres_noms=("Chapon",),
+        )
+        other = SpeciesEntry("Arthropode", "Chaponnet test", "Testus chaponi", ("mediterranee",))
+        catalog = SpeciesCatalog([other, chapon])
+        self.assertEqual(catalog.search("chapon")[0], chapon)
+
+    def test_region_filter_keeps_entries_without_known_region(self) -> None:
+        med = SpeciesEntry("Ver", "Ver test", "Testus mediterraneus", ("mediterranee",))
+        unknown = SpeciesEntry("Ver", "Ver test mondial", "Testus mundi", ())
+        catalog = SpeciesCatalog([med, unknown])
+        self.assertEqual(set(catalog.search("ver test", region="mediterranee")), {med, unknown})
+
 
 if __name__ == "__main__":
     unittest.main()
