@@ -1,11 +1,13 @@
 """Base d'espèces (faune/flore) pour le tag des photos de plongée.
 
-La base embarquée (`data/species.csv`, ~8600 espèces) part d'un inventaire
+La base embarquée (`data/species.csv`, ~9600 espèces) part d'un inventaire
 réel validé en plongée (Stage Montjoi), complété par les espèces les plus
 observées par les naturalistes (iNaturalist via GBIF) dans chaque zone de
 plongée de l'application, uniquement marines (filtre WoRMS, à l'exception
 de quelques espèces de lac), avec tous leurs noms français connus (GBIF,
-Wikidata, WoRMS) et les noms usuels de plongeurs ("chapon", "mostelle"...).
+Wikidata, WoRMS, TAXREF) et les noms usuels de plongeurs ("chapon",
+"mostelle"...). TAXREF (Muséum national d'Histoire naturelle, Licence Ouverte)
+apporte aussi les poissons des outre-mer français et leurs zones.
 Voir scripts/species_db pour la reconstruire. Le fichier reste un CSV
 éditable à la main.
 """
