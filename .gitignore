@@ -9,9 +9,12 @@ AppDir/
 appimagetool
 *.AppImage
 
-# Page de telechargement : geree hors depot (uploadee par FTP separement),
-# pas de suivi git pour ce dossier.
-/site/
+# Site : mis en ligne par .github/workflows/site.yml. Restent hors depot :
+# l'ancien exe (servi desormais par les Releases), les donnees du compteur et
+# la cle de la page de statistiques (fichiers presents uniquement sur le serveur).
+/site/AquaBioScope.exe
+/site/compteur.data.php
+/site/stats.cle.php
 
 # Sorties intermediaires des scripts de collecte d'especes (voir scripts/species_db)
 scripts/species_db/out_*.csv

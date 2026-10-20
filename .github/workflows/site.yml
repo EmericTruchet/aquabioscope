@@ -1,0 +1,65 @@
+name: Mise en ligne du site
+
+# Envoie le dossier site/ sur l'hebergement IONOS a chaque modification.
+# Le compte FTP/SFTP utilise est limite au dossier du site : on envoie donc a
+# la racine de ce compte. L'envoi ajoute et remplace des fichiers mais n'en
+# supprime jamais : compteur.data.php (les compteurs) reste intact.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/site.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Clé de la page de statistiques
+        env:
+          STATS_KEY: ${{ secrets.STATS_KEY }}
+        run: |
+          # Sans le secret, on n'envoie ni stats.php ni sa cle : la version
+          # deja en ligne continue de fonctionner.
+          if [ -n "$STATS_KEY" ]; then
+            printf "<?php\nreturn '%s';\n" "$STATS_KEY" > site/stats.cle.php
+          else
+            echo "::warning::Secret STATS_KEY absent : stats.php n'est pas mis a jour."
+            rm -f site/stats.php
+          fi
+
+      - name: Envoi sur le serveur
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          host="${FTP_SERVER#*://}"; host="${host%%/*}"
+          mirror="mirror --reverse --verbose --no-perms \
+            --exclude-glob compteur.data.php --exclude-glob AquaBioScope.exe site/ ."
+          # SFTP en priorite, sinon FTP chiffre (FTPS). Jamais de FTP en clair.
+          if lftp --env-password -u "$FTP_USERNAME" \
+               -e "set sftp:auto-confirm yes; set net:max-retries 2; set net:timeout 30; $mirror; bye" \
+               "sftp://$host"; then
+            echo "Envoi fait en SFTP."
+          else
+            echo "SFTP indisponible, essai en FTPS."
+            lftp --env-password -u "$FTP_USERNAME" \
+              -e "set ftp:ssl-force true; set ftp:ssl-protect-data true; set net:max-retries 2; set net:timeout 30; $mirror; bye" \
+              "ftp://$host"
+          fi

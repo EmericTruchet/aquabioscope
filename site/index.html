@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AquaBioScope — Retouche &amp; tag d'espèces pour la plongée</title>
+<meta name="description" content="Logiciel gratuit pour plongeurs : retouche colorimétrique, identification d'espèces et renommage en masse de vos photos sous-marines. Windows, macOS et Linux.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14262E;
+    --navy: #0C232B;
+    --navy-2: #123540;
+    --teal: #1298A5;
+    --teal-dark: #0E7C86;
+    --teal-soft: #E4F3F2;
+    --coral: #DD7A42;
+    --coral-soft: #FBEADC;
+    --sand: #F7F2E7;
+    --card: #FFFFFF;
+    --border: #E7DFCC;
+    --text-secondary: #5C6A66;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--sand);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; letter-spacing: -0.01em; }
+  img { max-width: 100%; display: block; }
+  a { color: var(--teal-dark); }
+  svg.icon { width: 1em; height: 1em; vertical-align: -0.15em; }
+
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  .kicker {
+    display: block;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--coral);
+    margin-bottom: 10px;
+  }
+
+  /* Hero */
+  header.hero {
+    position: relative;
+    background:
+      radial-gradient(circle at 18% 8%, rgba(18,152,165,0.35), transparent 46%),
+      linear-gradient(165deg, var(--navy-2), var(--navy) 65%);
+    color: white;
+    padding: 68px 0 0;
+    text-align: center;
+    overflow: hidden;
+  }
+  header.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  header.hero .wrap { position: relative; z-index: 1; padding-bottom: 46px; }
+  header.hero .logo {
+    margin: 0 auto;
+    background: white;
+    border-radius: 50%;
+    padding: 9px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+  }
+  header.hero h1 {
+    font-size: 2.6rem;
+    margin: 18px 0 8px;
+  }
+  header.hero p.tagline {
+    font-size: 1.14rem;
+    color: #CFE7E9;
+    max-width: 600px;
+    margin: 0 auto 34px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--coral);
+    color: white;
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 15px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 10px 22px rgba(221,122,66,0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 26px rgba(221,122,66,0.42); }
+  .btn-meta {
+    margin-top: 16px;
+    font-size: 0.88rem;
+    color: #9FC6CA;
+  }
+  .btn-meta a { color: #D9EDEE; text-decoration: underline; text-underline-offset: 2px; }
+
+  .wave {
+    display: block;
+    width: 100%;
+    height: 54px;
+    margin-top: -2px;
+  }
+
+  /* Downloads */
+  section.downloads { background: var(--sand); padding-top: 8px; }
+  .download-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .download-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 30px 24px;
+    text-align: center;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .download-card:hover { border-color: var(--teal); box-shadow: 0 12px 26px rgba(18,152,165,0.14); transform: translateY(-2px); }
+  .download-card .os-icon { width: 46px; height: 46px; margin: 0 auto 16px; color: var(--navy); }
+  .download-card h3 { margin: 0 0 6px; font-size: 1.2rem; color: var(--navy); }
+  .download-card p.meta { color: var(--text-secondary); font-size: 0.86rem; margin: 0 0 20px; }
+  .download-card .btn { width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.98rem; box-shadow: none; }
+  .download-card .btn:hover { box-shadow: 0 8px 18px rgba(221,122,66,0.3); }
+
+  @media (max-width: 720px) {
+    .download-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Sections */
+  section { padding: 60px 0; }
+  section.alt { background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  h2 {
+    font-size: 1.75rem;
+    text-align: center;
+    margin: 0 0 10px;
+    color: var(--navy);
+  }
+  p.section-intro {
+    text-align: center;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 44px;
+  }
+
+  /* Features grid */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+  }
+  .feature {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px;
+  }
+  .feature .icon-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: var(--teal-soft);
+    color: var(--teal-dark);
+    margin-bottom: 14px;
+  }
+  .feature .icon-badge svg { width: 24px; height: 24px; }
+  .feature h3 { margin: 0 0 8px; font-size: 1.08rem; color: var(--navy); }
+  .feature p { margin: 0; color: var(--text-secondary); font-size: 0.94rem; }
+
+  /* Tutorial steps */
+  .step {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 36px;
+    align-items: center;
+    padding: 42px 0;
+  }
+  .step:not(:last-child) { border-bottom: 1px solid var(--border); }
+  .step.reverse { grid-template-columns: 1.3fr 1fr; }
+  .step.reverse .step-text { order: 2; }
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px; height: 34px;
+    background: var(--coral-soft);
+    color: var(--coral);
+    border-radius: 50%;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .step-text h3 { margin: 0 0 10px; font-size: 1.3rem; color: var(--navy); }
+  .step-text p { color: var(--text-secondary); margin: 0 0 8px; }
+  .step-text ul { color: var(--text-secondary); padding-left: 20px; margin: 8px 0 0; }
+  .shot {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 14px 32px rgba(20,35,30,0.1);
+  }
+
+  .stats {
+    padding: 40px 0;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    text-align: center;
+  }
+  .stat + .stat { border-left: 1px solid var(--border); }
+  .stat-num {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 2.1rem;
+    color: var(--coral);
+  }
+  .stat-label {
+    display: block;
+    font-size: 0.86rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  @media (max-width: 720px) {
+    .step, .step.reverse { grid-template-columns: 1fr; }
+    .step.reverse .step-text { order: 0; }
+    .stat + .stat { border-left: none; border-top: 1px solid var(--border); padding-top: 14px; }
+    header.hero h1 { font-size: 2rem; }
+  }
+
+  /* Install note */
+  .note {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--coral-soft);
+    border: 1px solid #EFC9A8;
+    border-radius: 10px;
+    padding: 18px 22px;
+    color: #8A4B22;
+    font-size: 0.95rem;
+  }
+  .note svg { flex: none; width: 22px; height: 22px; margin-top: 2px; color: var(--coral); }
+
+  footer {
+    text-align: center;
+    padding: 44px 24px 60px;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+  }
+
+  /* Contact */
+  .contact-form {
+    max-width: 520px;
+    margin: 0 auto;
+    display: grid;
+    gap: 14px;
+  }
+  .contact-form label {
+    display: block;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .contact-form input,
+  .contact-form textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+    font: inherit;
+  }
+  .contact-form input:focus,
+  .contact-form textarea:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+  }
+  .contact-form textarea { min-height: 130px; resize: vertical; }
+  .contact-form .hp { position: absolute; left: -9999px; }
+  .contact-form button {
+    justify-self: start;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+  }
+  .form-banner {
+    max-width: 520px;
+    margin: 0 auto 18px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+  }
+  .form-banner.ok { background: var(--teal-soft); color: var(--teal-dark); }
+  .form-banner.error { background: var(--coral-soft); color: #8A4B22; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <img class="logo" src="logo.png" alt="Logo AquaBioScope" width="150" height="150">
+    <h1>AquaBioScope</h1>
+    <p class="tagline">Retouche colorimétrique, identification d'espèces et renommage en masse pour tes photos de plongée sous-marine — un logiciel gratuit, qui se met à jour tout seul.</p>
+    <div class="btn-meta" id="version-badge"></div>
+  </div>
+
+  <svg class="wave" viewBox="0 0 1200 60" preserveAspectRatio="none">
+    <path d="M0,32 C200,64 400,0 600,24 C800,48 1000,8 1200,32 L1200,60 L0,60 Z" fill="var(--sand)"/>
+  </svg>
+</header>
+
+<section class="downloads">
+  <div class="wrap">
+    <span class="kicker">Téléchargement</span>
+    <h2>Choisis ton système</h2>
+    <p class="section-intro">Gratuit, sans compte, sans publicité. Sous Windows, l'application se met à jour toute seule.</p>
+    <div class="download-grid">
+      <div class="download-card">
+        <!-- Installateur Inno Setup, servi depuis la derniere Release GitHub
+             (adresse dans compteur.php, liste DOWNLOADS). Il installe dans le
+             dossier de l'utilisateur, sans droits admin, ce qui permet la mise
+             a jour automatique depuis l'application. L'exe portable reste
+             disponible sur la page des Releases GitHub. -->
+        <svg class="os-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+        <h3>Windows</h3>
+        <p class="meta">Installateur · ~79 Mo · mises à jour automatiques</p>
+        <a class="btn" href="download.php?os=windows" rel="nofollow">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Télécharger
+        </a>
+      </div>
+      <div class="download-card">
+        <svg class="os-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 8.2c-.4-1.6.6-3.2 2.1-3.7-.1 1.5-1 2.9-2.1 3.7z"/><path d="M12.2 8.6c1.8 0 3.4.9 4.4 2.6 1.6 2.7 1 6.9-1.5 9.6-.8.9-1.7 1.3-2.6 1.3-.9 0-1.4-.4-2.5-.4s-1.7.4-2.5.4c-.9 0-1.9-.5-2.7-1.5-2.3-2.7-2.7-6.8-1-9.4 1-1.6 2.6-2.5 4.2-2.5.9 0 1.9.5 2.5.5s1.7-.6 2.7-.6z"/></svg>
+        <h3>macOS</h3>
+        <p class="meta">Apple Silicon (M1/M2/M3/M4) · ~98 Mo</p>
+        <a class="btn" href="download.php?os=macos" rel="nofollow">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Télécharger
+        </a>
+      </div>
+      <div class="download-card">
+        <svg class="os-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><path d="M13 15h4"/></svg>
+        <h3>Linux</h3>
+        <p class="meta">AppImage · ~183 Mo</p>
+        <a class="btn" href="download.php?os=linux" rel="nofollow">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Télécharger
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="wrap stats-grid">
+    <div class="stat">
+      <span class="stat-num">8600+</span>
+      <span class="stat-label">espèces référencées</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">13</span>
+      <span class="stat-label">groupes taxonomiques (poissons, coraux, mollusques, mammifères marins...)</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">7</span>
+      <span class="stat-label">zones de plongée couvertes, de la Méditerranée au Pacifique</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="kicker">Fonctionnalités</span>
+    <h2>Ce que fait AquaBioScope</h2>
+    <p class="section-intro">Un seul passage, photo par photo : couleur, identification, export.</p>
+    <div class="features">
+      <div class="feature">
+        <div class="icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="21" x2="5" y2="10"/><line x1="5" y1="6" x2="5" y2="3"/><line x1="12" y1="21" x2="12" y2="14"/><line x1="12" y1="10" x2="12" y2="3"/><line x1="19" y1="21" x2="19" y2="16"/><line x1="19" y1="12" x2="19" y2="3"/><circle cx="5" cy="8" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="14" r="2"/></svg>
+        </div>
+        <h3>Retouche adaptée à la plongée</h3>
+        <p>4 corrections qui s'adaptent à chaque photo (naturel, grand bleu, flash, eau verte), recadrage, presets personnalisés, et RAW pris en charge (dont les Olympus TG).</p>
+      </div>
+      <div class="feature">
+        <div class="icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12c3-5 8-7 13-5-1 2-1 4 2 5-3 1-3 3-2 5-5 2-10 0-13-5Z"/><circle cx="8" cy="11" r="0.6" fill="currentColor" stroke="none"/><path d="M4 12l-2.4 1.6M4 12l-2.4-1.6"/></svg>
+        </div>
+        <h3>Identification d'espèces</h3>
+        <p>Plus de 8600 espèces marines, filtrées par zone de plongée, trouvables aussi par leurs noms de plongeurs (« chapon », « mostelle »…), recherche tolérante aux fautes de frappe.</p>
+      </div>
+      <div class="feature">
+        <div class="icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a1 1 0 0 1 1-1h4l2 2h10a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/><path d="M12 10v6M9.5 13.5 12 16l2.5-2.5"/></svg>
+        </div>
+        <h3>Renommage &amp; export automatique</h3>
+        <p>Fichiers renommés par espèce et lieu, crédit photo incrusté, et un inventaire Excel généré à la fin de la session.</p>
+      </div>
+      <div class="feature">
+        <div class="icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h4M4 4v4M20 4h-4M20 4v4M4 20h4M4 20v-4M20 20h-4M20 20v-4"/><circle cx="12" cy="12" r="3.4"/></svg>
+        </div>
+        <h3>Aide à l'identification</h3>
+        <p>Un bouton envoie directement la photo vers Google Lens si une espèce reste introuvable dans la base.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <span class="kicker">Mode d'emploi</span>
+    <h2>Comment ça marche</h2>
+    <p class="section-intro">Quatre étapes, du dossier de photos brutes jusqu'au dossier prêt à partager.</p>
+
+    <div class="step">
+      <div class="step-text">
+        <span class="step-num">1</span>
+        <h3>Nouvelle session</h3>
+        <p>Indique le dossier de tes photos brutes (JPG ou RAW), un dossier de sortie, le lieu et la date de la plongée, la zone géographique, et ton nom pour le crédit photo.</p>
+        <p>Ces informations sont mémorisées d'une session à l'autre — rien à ressaisir à chaque plongée.</p>
+        <p>Les RAW sont pris en charge, y compris les ORF des Olympus / OM System TG (mis au point sur le TG-6) : l'application garde le rendu et les corrections d'objectif de l'appareil (distorsion, vignetage, bruit), et y ajoute le fin détail du RAW en pleine résolution.</p>
+      </div>
+      <div class="step-img"><img class="shot" src="screenshots/01_accueil.png" alt="Écran de démarrage d'une session AquaBioScope"></div>
+    </div>
+
+    <div class="step reverse">
+      <div class="step-text">
+        <span class="step-num">2</span>
+        <h3>Retouche colorimétrique</h3>
+        <p>Pour chaque photo, choisis parmi 4 corrections (ou l'original) en un clic : elles s'adaptent à la photo, au flash comme en lumière naturelle. Recadrage, zoom à la molette, et presets personnalisés nommés.</p>
+        <ul>
+          <li>Touches 1-5 pour les corrections</li>
+          <li>C pour recadrer (ou reprendre le cadrage de la photo précédente)</li>
+          <li>Suppr pour écarter une photo ratée</li>
+        </ul>
+      </div>
+      <div class="step-img"><img class="shot" src="screenshots/02_revue.png" alt="Écran de revue colorimétrique avec galerie de presets"></div>
+    </div>
+
+    <div class="step">
+      <div class="step-text">
+        <span class="step-num">3</span>
+        <h3>Identification des espèces</h3>
+        <p>Recherche et tague les espèces visibles sur la photo. La recherche tolère les fautes de frappe et les pluriels, et affiche l'embranchement de chaque résultat.</p>
+        <p>Une série sur le même sujet ? Reprends les espèces de la photo précédente en un clic. Une espèce introuvable ? Ajoute-la librement, ou envoie la photo vers Google Lens.</p>
+      </div>
+      <div class="step-img"><img class="shot" src="screenshots/03_especes.png" alt="Écran de tag d'espèces avec recherche et chips"></div>
+    </div>
+
+    <div class="step reverse">
+      <div class="step-text">
+        <span class="step-num">4</span>
+        <h3>Export automatique</h3>
+        <p>Une fois toutes les photos passées en revue, AquaBioScope traite les photos retenues en pleine résolution, incruste le crédit, renomme les fichiers, et génère un inventaire Excel des espèces observées pendant la session.</p>
+      </div>
+      <div class="step-img"><img class="shot" src="screenshots/04_termine.png" alt="Écran de fin de session avec résumé de l'export"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="kicker">Installation</span>
+    <h2>Installation</h2>
+    <p class="section-intro">Windows : un installateur classique, sans droits administrateur. macOS et Linux : un seul fichier à lancer.</p>
+    <div class="note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a1.8 1.8 0 0 0 1.5 2.7h17.4a1.8 1.8 0 0 0 1.5-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0Z"/></svg>
+      <div>
+        <strong>Windows</strong> peut afficher un avertissement SmartScreen (« Windows a protégé votre ordinateur ») au premier lancement, le temps que l'application se fasse connaître. Clique sur <strong>Informations complémentaires</strong> puis <strong>Exécuter quand même</strong>. Ensuite, l'application se met à jour d'elle-même : un bandeau signale chaque nouvelle version.<br>
+        <strong>macOS</strong> affichera « développeur non identifié » : fais un clic droit sur l'app → <strong>Ouvrir</strong> → <strong>Ouvrir</strong> (une seule fois).<br>
+        <strong>Linux</strong> : rends l'AppImage exécutable (<code>chmod +x</code>) puis double-clique dessus.<br>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="contact">
+  <div class="wrap">
+    <span class="kicker">Contact</span>
+    <h2>Une remarque, un bug, une espèce manquante ?</h2>
+    <p class="section-intro">Écris-moi directement, je lis tout.</p>
+
+    <div id="form-banner-ok" class="form-banner ok" hidden>Message envoyé, merci ! Je réponds dès que possible.</div>
+    <div id="form-banner-error" class="form-banner error" hidden>Un souci a empêché l'envoi — réessaie, ou écris directement à <a href="mailto:contact@hoxo.fr">contact@hoxo.fr</a>.</div>
+
+    <form class="contact-form" action="contact.php" method="post">
+      <input class="hp" type="text" name="site_web" tabindex="-1" autocomplete="off">
+      <div>
+        <label for="contact-name">Nom (optionnel)</label>
+        <input id="contact-name" type="text" name="name" autocomplete="name">
+      </div>
+      <div>
+        <label for="contact-email">Ton email (pour te répondre)</label>
+        <input id="contact-email" type="email" name="email" required autocomplete="email">
+      </div>
+      <div>
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" required></textarea>
+      </div>
+      <button class="btn" type="submit">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M3 6l9 6 9-6"/></svg>
+        Envoyer
+      </button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  AquaBioScope — logiciel gratuit pour plongeurs, sans compte ni suivi. Base d'espèces construite à partir de données ouvertes (iNaturalist, GBIF, Wikidata).
+</footer>
+
+<script>
+(function () {
+  // Les boutons de telechargement passent par download.php (compteur), qui
+  // redirige vers les fichiers listes dans compteur.php. Pour macOS et Linux
+  // c'est l'URL permanente GitHub "derniere release"
+  // (releases/latest/download/<fichier>), qui pointe toujours vers la bonne
+  // version sans upload FTP. Seul le numero affiche ci-dessous est recupere
+  // dynamiquement (purement cosmetique).
+  var versionBadge = document.getElementById('version-badge');
+  if (!versionBadge) return;
+
+  fetch('https://api.github.com/repos/EmericTruchet/aquabioscope/releases/latest')
+    .then(function (r) { if (!r.ok) throw new Error('pas de release'); return r.json(); })
+    .then(function (release) {
+      if (release.tag_name) versionBadge.textContent = 'Version ' + release.tag_name.replace(/^v/, '');
+    })
+    .catch(function () { /* API indisponible : pas grave, le badge reste vide */ });
+})();
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var status = params.get('contact');
+  if (!status) return;
+  var banner = document.getElementById(status === 'ok' ? 'form-banner-ok' : 'form-banner-error');
+  if (banner) banner.hidden = false;
+  params.delete('contact');
+  var qs = params.toString();
+  history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + '#contact');
+})();
+</script>
+
+</body>
+</html>
