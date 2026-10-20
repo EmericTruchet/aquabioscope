@@ -1,9 +1,79 @@
-"""Écrans de fin de session : progression de l'export, puis résumé final."""
+"""Écrans de fin de session : récapitulatif avant export, progression de
+l'export, puis résumé final."""
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QLabel, QProgressBar, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtGui import QDesktopServices, QKeySequence, QShortcut
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QProgressBar, QPushButton, QVBoxLayout, QWidget
+
+
+def _plural(count: int, word: str) -> str:
+    """_plural(2, "photo retenue") -> "2 photos retenues"."""
+    if count > 1:
+        word = " ".join(w + "s" for w in word.split())
+    return f"{count} {word}"
+
+
+class ReadyToExportWidget(QWidget):
+    """Toutes les photos sont passées : dernière chance de revenir en arrière
+    avant de lancer l'export."""
+
+    export_requested = Signal()
+    back_requested = Signal()
+
+    def __init__(self) -> None:
+        super().__init__()
+        title = QLabel("Tout est prêt")
+        title.setObjectName("Title")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.summary_label = QLabel("")
+        self.summary_label.setObjectName("Subtitle")
+        self.summary_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.summary_label.setWordWrap(True)
+
+        self.warning_label = QLabel("")
+        self.warning_label.setObjectName("ProgressBadge")
+        self.warning_label.hide()
+
+        back_btn = QPushButton("←  Revenir aux photos")
+        back_btn.setObjectName("SecondaryButton")
+        back_btn.clicked.connect(self.back_requested)
+        self.export_btn = QPushButton("Exporter  →")
+        self.export_btn.setDefault(True)
+        self.export_btn.clicked.connect(self.export_requested)
+        QShortcut(QKeySequence(Qt.Key.Key_Backspace), self, activated=self.back_requested.emit)
+
+        buttons = QHBoxLayout()
+        buttons.addStretch()
+        buttons.addWidget(back_btn)
+        buttons.addWidget(self.export_btn)
+        buttons.addStretch()
+
+        layout = QVBoxLayout(self)
+        layout.addStretch()
+        layout.addWidget(title, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addSpacing(8)
+        layout.addWidget(self.summary_label)
+        layout.addWidget(self.warning_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addSpacing(16)
+        layout.addLayout(buttons)
+        layout.addStretch()
+
+    def set_summary(self, kept: int, deleted: int, species: int, untagged: int) -> None:
+        self.summary_label.setText(
+            "Toutes les photos sont passées en revue.\n"
+            f"{_plural(kept, 'photo retenue')} · {_plural(deleted, 'écartée')} · "
+            f"{_plural(species, 'espèce différente')}"
+        )
+        self.warning_label.setText(
+            f"{_plural(untagged, 'photo retenue')} sans espèce : "
+            + ("elles seront exportées mais n'ajoutent" if untagged > 1 else "elle sera exportée mais n'ajoute")
+            + " rien à l'inventaire"
+        )
+        self.warning_label.setVisible(untagged > 0)
+        self.export_btn.setEnabled(kept > 0)
+        self.export_btn.setFocus()
 
 
 class ExportProgressWidget(QWidget):

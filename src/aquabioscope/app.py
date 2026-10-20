@@ -13,9 +13,10 @@ from aquabioscope import __version__, series
 from aquabioscope.imaging.color import CustomPresetParams
 from aquabioscope.imaging.crop import CropRect
 from aquabioscope.imaging.loader import load_rgb, make_thumbnail
+from aquabioscope.inventory import unique_sorted_species
 from aquabioscope.session import DiveSession
 from aquabioscope.species import SpeciesCatalog, SpeciesEntry
-from aquabioscope.ui.export_screens import ExportProgressWidget, SessionCompleteWidget
+from aquabioscope.ui.export_screens import ExportProgressWidget, ReadyToExportWidget, SessionCompleteWidget
 from aquabioscope.ui.export_worker import ExportWorker
 from aquabioscope.ui.onboarding import OnboardingWidget
 from aquabioscope.ui.review import ReviewWidget
@@ -72,6 +73,11 @@ class MainWindow(QMainWindow):
         self.species_tag_widget.tags_confirmed.connect(self._on_tags_confirmed)
         self.species_tag_widget.back_requested.connect(self._on_back_to_review)
         self.stack.addWidget(self.species_tag_widget)
+
+        self.ready_to_export = ReadyToExportWidget()
+        self.ready_to_export.export_requested.connect(self._start_export)
+        self.ready_to_export.back_requested.connect(self._back_from_ready)
+        self.stack.addWidget(self.ready_to_export)
 
         self.export_progress = ExportProgressWidget()
         self.stack.addWidget(self.export_progress)
@@ -240,7 +246,23 @@ class MainWindow(QMainWindow):
             self._load_current_photo()
             self.stack.setCurrentWidget(self.review)
         else:
-            self._start_export()
+            self._show_ready_to_export()
+
+    def _show_ready_to_export(self) -> None:
+        kept = [str(p) for p in self.photos if self.choices.get(str(p)) is not None]
+        species = unique_sorted_species([self.species_tags.get(path_str, []) for path_str in kept])
+        self.ready_to_export.set_summary(
+            kept=len(kept), deleted=len(self.photos) - len(kept), species=len(species),
+            untagged=sum(1 for path_str in kept if not self.species_tags.get(path_str)),
+        )
+        self.stack.setCurrentWidget(self.ready_to_export)
+
+    def _back_from_ready(self) -> None:
+        """Rouvre la dernière photo ; « Photo précédente » permet de remonter."""
+        self._pending_series = []
+        self.current_index = len(self.photos) - 1
+        self._load_current_photo()
+        self.stack.setCurrentWidget(self.review)
 
     def _start_export(self) -> None:
         self.stack.setCurrentWidget(self.export_progress)

@@ -176,6 +176,27 @@ class NavigationFlowTest(unittest.TestCase):
         self.assertEqual(self.window.current_index, 4)
         self.review._confirm()
         self._tag()
+        # derniere photo validee : recapitulatif, pas d'export automatique
+        self.window._start_export.assert_not_called()
+        self.assertIs(self.window.stack.currentWidget(), self.window.ready_to_export)
+        self.assertIn("5 photos retenues", self.window.ready_to_export.summary_label.text())
+        self.assertIn("2 espèces différentes", self.window.ready_to_export.summary_label.text())
+        self.assertIn("2 photos retenues sans espèce", self.window.ready_to_export.warning_label.text())
+
+    def test_ready_screen_allows_going_back_before_export(self) -> None:
+        for _ in self.window.photos:
+            self.review._confirm()
+            self._tag("Saupe")
+        self.assertIs(self.window.stack.currentWidget(), self.window.ready_to_export)
+        self.window.ready_to_export.back_requested.emit()
+        self.assertIs(self.window.stack.currentWidget(), self.review)
+        self.assertEqual(self.window.current_index, 4)
+        self.assertTrue(self.review.state_badge.isVisibleTo(self.review))  # deja validee
+        self.review._go_previous()
+        self.review._delete()
+        self.assertIs(self.window.stack.currentWidget(), self.window.ready_to_export)
+        self.assertIn("1 écartée", self.window.ready_to_export.summary_label.text())
+        self.window.ready_to_export.export_btn.click()
         self.window._start_export.assert_called_once()
 
 

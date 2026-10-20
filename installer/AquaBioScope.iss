@@ -6,7 +6,7 @@
 ; installateur en mode silencieux.
 ;
 ; Compilation (apres PyInstaller avec AquaBioScope-installer.spec) :
-;   iscc /DAppVersion=0.4.0 installer\AquaBioScope.iss
+;   iscc /DAppVersion=0.4.1 installer\AquaBioScope.iss
 ; Resultat : dist\AquaBioScope-Setup.exe
 
 #ifndef AppVersion
