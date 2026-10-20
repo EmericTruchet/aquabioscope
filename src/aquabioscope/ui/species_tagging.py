@@ -129,6 +129,9 @@ class SpeciesTagWidget(QWidget):
 
         title = QLabel("Quelles espèces sont visibles sur cette photo ?")
         title.setObjectName("Subtitle")
+        self.series_note = QLabel()
+        self.series_note.setObjectName("ProgressBadge")
+        self.series_note.hide()
 
         self.search_edit = QLineEdit()
         self.search_edit.setPlaceholderText("Rechercher une espèce (nom commun ou scientifique)…")
@@ -196,6 +199,7 @@ class SpeciesTagWidget(QWidget):
 
         right_col = QVBoxLayout()
         right_col.addWidget(title)
+        right_col.addWidget(self.series_note, alignment=Qt.AlignmentFlag.AlignLeft)
         right_col.addLayout(search_row)
         right_col.addLayout(chips_header)
         right_col.addWidget(self.chips_container)
@@ -223,9 +227,16 @@ class SpeciesTagWidget(QWidget):
     def show_photo(
         self, path: Path, rgb_thumb: np.ndarray, index: int, total: int, region: str | None,
         initial: list[SpeciesEntry] | None = None, previous: list[SpeciesEntry] | None = None,
+        series_count: int = 0,
     ) -> None:
         """`initial` : espèces déjà taguées (retour depuis le filtre) ;
-        `previous` : celles de la photo précédente, pour le bouton ↺."""
+        `previous` : celles de la photo précédente, pour le bouton ↺ ;
+        `series_count` : autres photos de la série qui recevront ces espèces."""
+        self.series_note.setText(
+            f"📚 Série : ces espèces seront aussi appliquées aux {series_count} autres photos de la série"
+            if series_count > 1 else "📚 Série : ces espèces seront aussi appliquées à l'autre photo de la série"
+        )
+        self.series_note.setVisible(series_count > 0)
         self._current_path = path
         self._current_rgb = rgb_thumb
         self.region = region

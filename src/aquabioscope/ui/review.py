@@ -9,6 +9,10 @@ aquabioscope.custom_presets_store). Valider (clic sur l'aperçu, bouton, ou
 Entrée) passe à la photo suivante ; Supprimer (bouton ou touche Suppr)
 écarte la photo. Recadrer (bouton ou touche C) ouvre le dialogue de
 recadrage ; l'aperçu et les vignettes montrent alors la photo recadrée.
+« ← Photo précédente » (ou Retour arrière) rouvre la photo d'avant avec ce
+qui avait été choisi. Quand la photo ouvre une série (rafale sur un même
+sujet), « Valider pour la série » (ou S) applique les mêmes choix aux photos
+suivantes cochées.
 """
 from __future__ import annotations
 
@@ -265,6 +269,8 @@ class ReviewWidget(QWidget):
     """Affiche une photo : grand aperçu du preset retenu + galerie pour en changer."""
 
     choice_made = Signal(str, object, object)  # (chemin photo, cle/preset ou None si supprimee, CropRect ou None)
+    series_choice_made = Signal(str, object, object)  # idem, a appliquer aussi a la serie
+    previous_requested = Signal()
 
     def __init__(self) -> None:
         super().__init__()
@@ -275,6 +281,7 @@ class ReviewWidget(QWidget):
         self._previous_crop: CropRect | None = None
         self._versions: dict[str, QPixmap] = {}  # cle -> apercu grand format (calcule a la demande)
         self._selected_key = DEFAULT_PRESET
+        self._series_count = 0
         self._named_presets = load_named_presets()
 
         self.progress_label = QLabel()
@@ -291,6 +298,10 @@ class ReviewWidget(QWidget):
         self.crop_badge.setObjectName("ProgressBadge")
         self.crop_badge.hide()
         header.addWidget(self.crop_badge)
+        self.state_badge = QLabel()
+        self.state_badge.setObjectName("ProgressBadge")
+        self.state_badge.hide()
+        header.addWidget(self.state_badge)
 
         self.preview = _ScalablePreview()
         self.preview.clicked.connect(self._confirm)
@@ -313,11 +324,11 @@ class ReviewWidget(QWidget):
             self._add_named_tile(name)
 
         hint = QLabel(
-            "Clique sur l'aperçu (ou Entrée) pour valider  •  molette pour zoomer, glisser pour se déplacer, "
-            "double-clic pour réinitialiser  •  1-5 pour les presets fixes  •  "
-            "C pour recadrer  •  clic droit sur un preset personnalisé pour le supprimer  •  "
-            "Suppr pour écarter la photo"
+            "Entrée ou clic sur l'aperçu : valider  •  S : toute la série  •  Retour arrière : photo précédente  •  "
+            "1-5 : corrections  •  C : recadrer  •  Suppr : écarter  •  molette : zoom (double-clic pour revenir)  •  "
+            "clic droit sur un preset personnalisé : le supprimer"
         )
+        hint.setWordWrap(True)
         hint.setObjectName("HintBar")
         hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -332,10 +343,24 @@ class ReviewWidget(QWidget):
         self.crop_btn.setObjectName("SecondaryButton")
         self.crop_btn.clicked.connect(self._open_crop_dialog)
 
+        self.previous_btn = QPushButton("←  Photo précédente")
+        self.previous_btn.setObjectName("SecondaryButton")
+        self.previous_btn.clicked.connect(self._go_previous)
+
+        self.series_btn = QPushButton()
+        self.series_btn.setObjectName("SecondaryButton")
+        self.series_btn.setToolTip(
+            "Applique cette correction, ce recadrage et les espèces aux photos de la même rafale (S)"
+        )
+        self.series_btn.clicked.connect(self._confirm_series)
+        self.series_btn.hide()
+
         actions = QHBoxLayout()
+        actions.addWidget(self.previous_btn)
         actions.addWidget(self.delete_btn)
         actions.addStretch()
         actions.addWidget(self.crop_btn)
+        actions.addWidget(self.series_btn)
         actions.addWidget(self.validate_btn)
 
         layout = QVBoxLayout(self)
@@ -353,30 +378,61 @@ class ReviewWidget(QWidget):
         QShortcut(QKeySequence(Qt.Key.Key_Enter), self, activated=self._confirm)
         QShortcut(QKeySequence(Qt.Key.Key_Delete), self, activated=self._delete)
         QShortcut(QKeySequence(Qt.Key.Key_C), self, activated=self._open_crop_dialog)
+        QShortcut(QKeySequence(Qt.Key.Key_S), self, activated=self._confirm_series)
+        QShortcut(QKeySequence(Qt.Key.Key_Backspace), self, activated=self._go_previous)
 
     @property
     def current_thumb(self) -> np.ndarray | None:
         """Aperçu de la photo en cours, recadré s'il y a lieu."""
         return self._current_thumb
 
+    @property
+    def selected_key(self) -> str:
+        return self._selected_key
+
     def show_photo(
         self, path: Path, rgb_thumb: np.ndarray, index: int, total: int,
         crop: CropRect | None = None, previous_crop: CropRect | None = None,
+        selected_key: str | None = None, deleted: bool = False, done: bool = False, series_count: int = 0,
     ) -> None:
-        """Affiche une nouvelle photo (déjà décodée + réduite) avec toutes ses versions."""
+        """Affiche une nouvelle photo (déjà décodée + réduite) avec toutes ses versions.
+
+        `selected_key` : correction déjà choisie (photo revue après un retour
+        arrière) ; `deleted` : photo écartée, qu'on peut récupérer en la
+        validant ; `done` : photo déjà validée ; `series_count` : nombre de photos de la même rafale qui
+        suivent celle-ci."""
         self._current_path = path
         self._full_thumb = rgb_thumb
         self._crop = crop
         self._previous_crop = previous_crop
         self.progress_label.setText(f"Photo {index + 1} / {total}")
         self.filename_label.setText(path.name)
+        self.previous_btn.setEnabled(index > 0)
+        if deleted:
+            self.state_badge.setText("Écartée — valide-la pour la garder")
+        elif done:
+            self.state_badge.setText("✓ Déjà validée")
+        self.state_badge.setVisible(deleted or done)
+        self._series_count = series_count
+        self.series_btn.setText(f"📚  Valider pour la série ({series_count + 1})")
+        self.series_btn.setVisible(series_count > 0)
         self._render_versions()
 
         # Choix "maintenu" : on garde le dernier preset choisi comme point de
         # depart pour la photo suivante (souvent la meme lumiere/scene), sauf
         # s'il a ete supprime entre-temps.
-        initial_key = self._selected_key if self._is_valid_key(self._selected_key) else DEFAULT_PRESET
+        if selected_key is not None and self._is_valid_key(selected_key):
+            initial_key = selected_key
+        elif self._is_valid_key(self._selected_key):
+            initial_key = self._selected_key
+        else:
+            initial_key = DEFAULT_PRESET
         self._select(initial_key)
+
+    def render_choice(self, rgb: np.ndarray, crop: bool = True) -> np.ndarray:
+        """Applique à une autre photo le recadrage (si `crop`) et la
+        correction choisis pour celle-ci (vignettes du dialogue de série)."""
+        return self._render(self._selected_key, apply_crop(rgb, self._crop) if crop else rgb)
 
     def _render_versions(self) -> None:
         rgb_thumb = apply_crop(self._full_thumb, self._crop)
@@ -472,6 +528,16 @@ class ReviewWidget(QWidget):
             return
         value = self._named_presets.get(self._selected_key, self._selected_key)
         self.choice_made.emit(str(self._current_path), value, self._crop)
+
+    def _confirm_series(self) -> None:
+        if self._current_path is None or self._series_count == 0:
+            return
+        value = self._named_presets.get(self._selected_key, self._selected_key)
+        self.series_choice_made.emit(str(self._current_path), value, self._crop)
+
+    def _go_previous(self) -> None:
+        if self._current_path is not None and self.previous_btn.isEnabled():
+            self.previous_requested.emit()
 
     def _delete(self) -> None:
         if self._current_path is None:

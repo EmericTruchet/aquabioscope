@@ -87,6 +87,6 @@ par le workflow pour un fichier unique portable.
 
 ## État du projet
 
-Pipeline complet fonctionnel : accueil (dossiers, lieu, date, zone, crédit) → revue colorimétrique (4 corrections adaptatives + original, recadrage) → tags d'espèces (base mondiale, 9600+ espèces) → export (retouche pleine résolution, crédit incrusté, renommage, EXIF, inventaire Excel) → compilation en exécutable Windows/macOS/Linux.
+Pipeline complet fonctionnel : accueil (dossiers, lieu, date, zone, crédit) → revue colorimétrique (4 corrections adaptatives + original, recadrage, retour arrière, séries de photos) → tags d'espèces (base mondiale, 9600+ espèces) → export (retouche pleine résolution, crédit incrusté, renommage, EXIF, inventaire Excel) → compilation en exécutable Windows/macOS/Linux.
 
 Sources de la base d'espèces (données ouvertes) : iNaturalist via GBIF, WoRMS, Wikidata, et TAXREF (Muséum national d'Histoire naturelle, Licence Ouverte Etalab) pour les noms français et la présence en outre-mer.
