@@ -71,6 +71,17 @@ TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AquaBioScope — Nouveautés</title>
 <meta name="description" content="Toutes les nouveautés d'AquaBioScope, version par version.">
+<link rel="canonical" href="https://hoxo.fr/aquabioscope/nouveautes.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="AquaBioScope">
+<meta property="og:url" content="https://hoxo.fr/aquabioscope/nouveautes.html">
+<meta property="og:title" content="AquaBioScope — Nouveautés">
+<meta property="og:description" content="Toutes les nouveautés d'AquaBioScope, version par version.">
+<meta property="og:image" content="https://hoxo.fr/aquabioscope/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
