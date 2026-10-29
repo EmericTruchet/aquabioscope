@@ -40,12 +40,22 @@ class UpdaterTest(unittest.TestCase):
 
 
 class ReleaseNotesTest(unittest.TestCase):
-    CHANGELOG = "# Titre\n\nintro\n\n## 1.1.0\n\n- deux\n\n## 1.0.0\n\n- un\n"
+    CHANGELOG = "# Titre\n\nintro\n\n## 1.1.0 · 2 mai 2026 · ✨ Titre\n\n- deux\n\n## 1.0.0\n\n- un\n"
 
     def test_extracts_only_the_requested_version(self) -> None:
         self.assertEqual(release_notes.section("v1.1.0", self.CHANGELOG), "- deux")
         self.assertEqual(release_notes.section("1.0.0", self.CHANGELOG), "- un")
         self.assertIsNone(release_notes.section("2.0.0", self.CHANGELOG))
+
+    def test_notes_page_lists_every_version_with_title(self) -> None:
+        import build_notes_page
+        versions = build_notes_page.parse(release_notes.CHANGELOG.read_text(encoding="utf-8"))
+        self.assertEqual(versions[0]["version"], updater.__version__)  # la plus recente en tete
+        for v in versions:
+            self.assertTrue(v["date"] and v["title"] and v["items"], v["version"])
+        page = build_notes_page.render(versions)
+        self.assertIn("Dernière version", page)
+        self.assertNotIn("**", page)
 
     def test_current_version_has_release_notes(self) -> None:
         # une version ne doit pas partir sans note : le build du tag echouerait

@@ -316,6 +316,15 @@
     border-radius: 8px;
     font-size: 0.92rem;
   }
+  header.hero .notes-link {
+    display: inline-block;
+    margin-top: 14px;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.92rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.35);
+  }
+  header.hero .notes-link:hover { color: white; border-bottom-color: white; }
   .form-banner.ok { background: var(--teal-soft); color: var(--teal-dark); }
   .form-banner.error { background: var(--coral-soft); color: #8A4B22; }
 </style>
@@ -328,6 +337,7 @@
     <h1>AquaBioScope</h1>
     <p class="tagline">Retouche colorimétrique, identification d'espèces assistée par IA et renommage en masse pour tes photos de plongée sous-marine — un logiciel gratuit, qui se met à jour tout seul.</p>
     <div class="btn-meta" id="version-badge"></div>
+    <a class="notes-link" href="nouveautes.html">📰 Voir les nouveautés de chaque version</a>
   </div>
 
   <svg class="wave" viewBox="0 0 1200 60" preserveAspectRatio="none">
@@ -335,7 +345,7 @@
   </svg>
 </header>
 
-<section class="downloads">
+<section class="downloads" id="telechargement">
   <div class="wrap">
     <span class="kicker">Téléchargement</span>
     <h2>Choisis ton système</h2>
@@ -534,7 +544,7 @@
 </section>
 
 <footer>
-  AquaBioScope — logiciel gratuit pour plongeurs, sans compte ni suivi. Base d'espèces construite à partir de données ouvertes : iNaturalist, GBIF, WoRMS, Wikidata et TAXREF (Muséum national d'Histoire naturelle). Suggestions d'espèces : modèle BioCLIP 2.5 de l'Imageomics Institute (licence MIT).
+  AquaBioScope — logiciel gratuit pour plongeurs, sans compte ni suivi : seuls les noms d'espèces absentes de la base que tu ajoutes nous sont envoyés, anonymement, pour l'enrichir. <a href="nouveautes.html">Nouveautés</a>. Base d'espèces construite à partir de données ouvertes : iNaturalist, GBIF, WoRMS, Wikidata et TAXREF (Muséum national d'Histoire naturelle). Suggestions d'espèces : modèle BioCLIP 2.5 de l'Imageomics Institute (licence MIT).
 </footer>
 
 <script>

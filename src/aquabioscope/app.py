@@ -10,7 +10,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWidget, QVBoxLayout, QWidget
 
-from aquabioscope import __version__, series
+from aquabioscope import __version__, feedback, series
 from aquabioscope.imaging.color import CustomPresetParams
 from aquabioscope.imaging.crop import CropRect
 from aquabioscope.identify import SpeciesIdentifier
@@ -307,6 +307,7 @@ def main() -> None:
     window = MainWindow()
     window.show()
     window.update_banner.start_check()
+    feedback.flush_in_background()  # especes demandees restees en attente (hors connexion)
     sys.exit(app.exec())
 
 

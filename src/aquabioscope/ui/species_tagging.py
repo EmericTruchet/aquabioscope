@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
     QSizePolicy, QVBoxLayout, QWidget,
 )
 
+from aquabioscope import feedback
 from aquabioscope.identify import SpeciesIdentifier, Suggestion, square_zone
 from aquabioscope.species import SpeciesCatalog, SpeciesEntry
 from aquabioscope.ui.flow_layout import FlowLayout
@@ -233,6 +234,14 @@ class SpeciesTagWidget(QWidget):
         self.add_custom_btn.setObjectName("SecondaryButton")
         self.add_custom_btn.setEnabled(False)
         self.add_custom_btn.clicked.connect(self._add_custom)
+        self.add_custom_btn.setToolTip(
+            "Ajoute le nom tapé tel quel. Il est aussi proposé, anonymement et sans la photo, "
+            "à l'équipe AquaBioScope pour enrichir la base d'espèces."
+        )
+        self.custom_note = QLabel()
+        self.custom_note.setObjectName("HintBar")
+        self.custom_note.hide()
+        self._reported: set[str] = set()  # une seule remontee par nom et par lancement
 
         search_row = QHBoxLayout()
         search_row.addWidget(self.search_edit, stretch=1)
@@ -285,6 +294,7 @@ class SpeciesTagWidget(QWidget):
         right_col.addWidget(self.series_note, alignment=Qt.AlignmentFlag.AlignLeft)
         right_col.addWidget(self.ai_box)
         right_col.addLayout(search_row)
+        right_col.addWidget(self.custom_note)
         right_col.addLayout(chips_header)
         right_col.addWidget(self.chips_container)
         right_col.addWidget(self.results_list, stretch=1)
@@ -342,6 +352,7 @@ class SpeciesTagWidget(QWidget):
         self.filename_label.setText(path.name)
         self.lens_hint.setText("")
         self._lens_pending = False
+        self.custom_note.hide()
         self._ai_image = None
 
         pixmap = _rgb_to_pixmap(rgb_thumb).scaled(
@@ -512,6 +523,14 @@ class SpeciesTagWidget(QWidget):
             regions=(),
         )
         self._add_species(entry)
+        if text.casefold() not in self._reported:
+            self._reported.add(text.casefold())
+            feedback.report_unlisted_species(text, self.region)
+        self.custom_note.setText(
+            f"« {text} » ajoutée. Le nom est proposé anonymement à l'équipe AquaBioScope "
+            "pour enrichir la base d'espèces (sans la photo)."
+        )
+        self.custom_note.show()
 
     def _add_species(self, entry: SpeciesEntry) -> None:
         if entry in self._selected:

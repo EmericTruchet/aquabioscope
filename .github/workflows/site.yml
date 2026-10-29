@@ -12,6 +12,8 @@ on:
     paths:
       - "site/**"
       - ".github/workflows/site.yml"
+      - "NOUVEAUTES.md"
+      - "scripts/build_notes_page.py"
 
 permissions:
   contents: read
@@ -26,6 +28,13 @@ jobs:
     steps:
       - name: Récupération du code
         uses: actions/checkout@v4
+
+      - name: Page des nouveautés (à partir de NOUVEAUTES.md)
+        run: python3 scripts/build_notes_page.py
+
+      - name: Vérification de la syntaxe PHP
+        # une page en erreur n'est jamais envoyee : le site en ligne reste intact
+        run: for f in site/*.php; do php -l "$f" || exit 1; done
 
       - name: Installation de lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
@@ -51,7 +60,7 @@ jobs:
         run: |
           host="${FTP_SERVER#*://}"; host="${host%%/*}"
           mirror="mirror --reverse --verbose --no-perms \
-            --exclude-glob compteur.data.php --exclude-glob AquaBioScope.exe site/ ."
+            --exclude-glob compteur.data.php --exclude-glob demandes.data.php --exclude-glob AquaBioScope.exe site/ ."
           # SFTP en priorite, sinon FTP chiffre (FTPS). Jamais de FTP en clair.
           if lftp --env-password -u "$FTP_USERNAME" \
                -e "set sftp:auto-confirm yes; set net:max-retries 2; set net:timeout 30; $mirror; bye" \

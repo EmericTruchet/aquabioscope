@@ -20,7 +20,8 @@ def section(version: str, text: str) -> str | None:
         if line.startswith("## "):
             if inside:
                 break
-            inside = line[3:].strip().lstrip("vV") == version
+            # "## 0.5.2 · date · titre" : seul le numero compte
+            inside = line[3:].split()[0].lstrip("vV") == version if line[3:].split() else False
             continue
         if inside:
             lines.append(line)

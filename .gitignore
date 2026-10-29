@@ -14,6 +14,9 @@ appimagetool
 # la cle de la page de statistiques (fichiers presents uniquement sur le serveur).
 /site/AquaBioScope.exe
 /site/compteur.data.php
+/site/demandes.data.php
+# generee a la mise en ligne depuis NOUVEAUTES.md (scripts/build_notes_page.py)
+/site/nouveautes.html
 /site/stats.cle.php
 
 # Sorties intermediaires des scripts de collecte d'especes (voir scripts/species_db)
