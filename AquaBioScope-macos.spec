@@ -10,6 +10,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('src/aquabioscope/data/species.csv', 'aquabioscope/data'),
+        ('src/aquabioscope/data/especes_ia.npz', 'aquabioscope/data'),
         ('src/aquabioscope/assets/app_icon.icns', 'aquabioscope/assets'),
     ],
     hiddenimports=[],

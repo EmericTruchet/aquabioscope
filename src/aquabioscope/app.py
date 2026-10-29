@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+import threading
 from importlib import resources
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QStackedWi
 from aquabioscope import __version__, series
 from aquabioscope.imaging.color import CustomPresetParams
 from aquabioscope.imaging.crop import CropRect
+from aquabioscope.identify import SpeciesIdentifier
 from aquabioscope.imaging.loader import load_rgb, make_thumbnail
 from aquabioscope.inventory import unique_sorted_species
 from aquabioscope.session import DiveSession
@@ -48,6 +50,7 @@ class MainWindow(QMainWindow):
         self.export_worker: ExportWorker | None = None
 
         self.species_catalog = SpeciesCatalog()
+        self.species_identifier = SpeciesIdentifier(self.species_catalog)
 
         self.stack = QStackedWidget()
         self.update_banner = UpdateBanner()
@@ -89,6 +92,10 @@ class MainWindow(QMainWindow):
         self.session = session
         self.photos = session.scan_photos()
         self._reset_choices()
+        self.species_tag_widget.set_identifier(self.species_identifier if session.ai_suggestions else None)
+        if session.ai_suggestions:
+            # chargement du modele (quelques secondes) pendant le choix du filtre de la 1re photo
+            threading.Thread(target=self.species_identifier.preload, daemon=True).start()
 
         if not self.photos:
             QMessageBox.information(
@@ -209,8 +216,10 @@ class MainWindow(QMainWindow):
             return
 
         path = self.photos[self.current_index]
+        # photo corrigee et recadree, telle que choisie : c'est elle qui est
+        # affichee et envoyee a l'IA / Google Lens
         self.species_tag_widget.show_photo(
-            path, self.review.current_thumb, self.current_index, len(self.photos), self.session.region,
+            path, self.review.current_render, self.current_index, len(self.photos), self.session.region,
             initial=self.species_tags.get(path_str), previous=self._previous_photo_species(),
             series_count=len(self._pending_series),
         )

@@ -35,6 +35,7 @@ class DiveSession:
     dive_date: date
     photographer: str
     region: str = "mediterranee"
+    ai_suggestions: bool = False  # suggestions d'especes par IA (module telecharge a part)
 
     def __post_init__(self) -> None:
         self.input_dir = Path(self.input_dir)

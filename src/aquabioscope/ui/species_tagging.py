@@ -6,24 +6,38 @@ par la région de la plongée, embranchement affiché pour chaque résultat
 "chips" retirables. Une espèce absente de la base peut être ajoutée en
 texte libre. Un bouton reprend les espèces de la photo précédente (série
 sur un même sujet), un autre revient au choix du filtre de la photo.
+
+Si les suggestions IA sont activées pour la session, les espèces les plus
+probables (parmi celles de la zone de plongée) sont proposées en un clic,
+pour la photo entière ou pour une zone encadrée par l'utilisateur. Google
+Lens reste le recours quand l'IA hésite : il reçoit la même image (zone
+comprise), et un nom copié depuis sa page est recherché ici au retour dans
+l'application.
 """
 from __future__ import annotations
 
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QTimer, QUrl, Qt, Signal
+from PySide6.QtCore import QThread, QTimer, QUrl, Qt, Signal
 from PySide6.QtGui import QDesktopServices, QImage, QKeySequence, QPixmap, QShortcut
 from PySide6.QtWidgets import (
-    QApplication, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton,
+    QApplication, QHBoxLayout, QLabel, QLayout, QLineEdit, QListWidget, QListWidgetItem, QPushButton,
     QSizePolicy, QVBoxLayout, QWidget,
 )
 
+from aquabioscope.identify import SpeciesIdentifier, Suggestion, square_zone
 from aquabioscope.species import SpeciesCatalog, SpeciesEntry
 from aquabioscope.ui.flow_layout import FlowLayout
+from aquabioscope.ui.zone_dialog import ZoneDialog
 
 UNLISTED_EMBRANCHEMENT = "À préciser"
 GOOGLE_LENS_URL = "https://lens.google.com/upload"
+SUGGESTION_COUNT = 5
+# En dessous, la 1re suggestion n'est juste qu'1 fois sur 10 sur nos photos de
+# reference (7 a 8 fois sur 10 au-dessus) : on oriente alors vers Google Lens.
+LOW_CONFIDENCE = 0.5
+LENS_NAME_MAX_LEN = 80  # au-dela, le texte copie n'est pas un nom d'espece
 
 
 def _rgb_to_pixmap(rgb: np.ndarray) -> QPixmap:
@@ -86,6 +100,34 @@ class _Chip(QWidget):
         layout.addWidget(remove_btn)
 
 
+class _SuggestWorker(QThread):
+    done = Signal(int, list)  # (jeton de la demande, list[Suggestion])
+    failed = Signal(int, str)
+
+    def __init__(self, identifier: SpeciesIdentifier, rgb: np.ndarray, region: str | None, token: int, parent) -> None:
+        super().__init__(parent)
+        self._identifier = identifier
+        self._rgb = rgb
+        self._region = region
+        self._token = token
+
+    def run(self) -> None:
+        try:
+            result = self._identifier.suggest(self._rgb, self._region, k=SUGGESTION_COUNT)
+        except Exception as exc:  # noqa: BLE001 - modele absent/corrompu, onnxruntime : jamais bloquant
+            self.failed.emit(self._token, str(exc))
+            return
+        self.done.emit(self._token, result)
+
+
+def _clear_layout(layout: QLayout) -> None:
+    while layout.count():
+        item = layout.takeAt(0)
+        widget = item.widget()
+        if widget:
+            widget.deleteLater()
+
+
 class SpeciesTagWidget(QWidget):
     tags_confirmed = Signal(str, list)  # (chemin photo, list[SpeciesEntry])
     back_requested = Signal(list)  # especes deja taguees (brouillon conserve au retour)
@@ -98,6 +140,13 @@ class SpeciesTagWidget(QWidget):
         self._current_rgb: np.ndarray | None = None
         self._selected: list[SpeciesEntry] = []
         self._previous: list[SpeciesEntry] = []
+        self._identifier: SpeciesIdentifier | None = None
+        self._suggestions: list[Suggestion] = []
+        self._ai_token = 0  # seule la reponse a la derniere demande est affichee
+        self._ai_zone = False
+        self._ai_image: np.ndarray | None = None  # image (ou zone) analysee, envoyee aussi a Google Lens
+        self._lens_pending = False  # Google Lens ouvert : guetter un nom copie au retour
+        self._ai_workers: set[_SuggestWorker] = set()
 
         self.progress_label = QLabel()
         self.progress_label.setObjectName("ProgressBadge")
@@ -122,6 +171,7 @@ class SpeciesTagWidget(QWidget):
             "— colle-la (Ctrl+V) sur la page pour lancer la recherche visuelle."
         )
         self.lens_btn.clicked.connect(self._search_with_google_lens)
+        QApplication.instance().applicationStateChanged.connect(self._on_app_state_changed)
         self.lens_hint = QLabel("")
         self.lens_hint.setObjectName("HintBar")
         self.lens_hint.setWordWrap(True)
@@ -132,6 +182,39 @@ class SpeciesTagWidget(QWidget):
         self.series_note = QLabel()
         self.series_note.setObjectName("ProgressBadge")
         self.series_note.hide()
+
+        ai_title = QLabel("✨ Suggestions IA")
+        ai_title.setObjectName("FieldLabel")
+        self.ai_status = QLabel()
+        self.ai_status.setObjectName("HintBar")
+        self.whole_photo_btn = QPushButton("↺  Photo entière")
+        self.whole_photo_btn.setObjectName("SecondaryButton")
+        self.whole_photo_btn.setToolTip("Revenir aux suggestions pour toute la photo")
+        self.whole_photo_btn.clicked.connect(self._suggest_whole_photo)
+        self.whole_photo_btn.hide()
+        self.zone_btn = QPushButton("🎯  Identifier une zone")
+        self.zone_btn.setObjectName("SecondaryButton")
+        self.zone_btn.setToolTip(
+            "Encadrer un sujet précis de la photo (autre espèce, animal petit dans le cadre) "
+            "pour que l'IA ne regarde que lui (Ctrl+I)"
+        )
+        self.zone_btn.clicked.connect(self._identify_zone)
+        ai_header = QHBoxLayout()
+        ai_header.addWidget(ai_title)
+        ai_header.addSpacing(8)
+        ai_header.addWidget(self.ai_status)
+        ai_header.addStretch()
+        ai_header.addWidget(self.whole_photo_btn)
+        ai_header.addWidget(self.zone_btn)
+        self.suggestions_container = QWidget()
+        self.suggestions_layout = FlowLayout(self.suggestions_container, spacing=8)
+        self.ai_box = QWidget()
+        ai_layout = QVBoxLayout(self.ai_box)
+        ai_layout.setContentsMargins(0, 0, 0, 4)
+        ai_layout.setSpacing(6)
+        ai_layout.addLayout(ai_header)
+        ai_layout.addWidget(self.suggestions_container)
+        self.ai_box.hide()
 
         self.search_edit = QLineEdit()
         self.search_edit.setPlaceholderText("Rechercher une espèce (nom commun ou scientifique)…")
@@ -200,6 +283,7 @@ class SpeciesTagWidget(QWidget):
         right_col = QVBoxLayout()
         right_col.addWidget(title)
         right_col.addWidget(self.series_note, alignment=Qt.AlignmentFlag.AlignLeft)
+        right_col.addWidget(self.ai_box)
         right_col.addLayout(search_row)
         right_col.addLayout(chips_header)
         right_col.addWidget(self.chips_container)
@@ -221,8 +305,19 @@ class SpeciesTagWidget(QWidget):
         QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_Return), self, activated=self._confirm)
         QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_R), self, activated=self._reuse_previous)
         QShortcut(QKeySequence(Qt.Key.Key_Escape), self, activated=self._go_back)
+        QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_I), self, activated=self._identify_zone)
+        for n in range(1, SUGGESTION_COUNT + 1):
+            QShortcut(
+                QKeySequence(Qt.Modifier.CTRL | Qt.Key(Qt.Key.Key_0 + n)), self,
+                activated=lambda n=n: self._add_suggestion(n - 1),
+            )
 
         self._refresh_results()
+
+    def set_identifier(self, identifier: SpeciesIdentifier | None) -> None:
+        """Active (ou non, avec None) les suggestions IA pour la session."""
+        self._identifier = identifier
+        self.ai_box.setVisible(identifier is not None)
 
     def show_photo(
         self, path: Path, rgb_thumb: np.ndarray, index: int, total: int, region: str | None,
@@ -246,6 +341,8 @@ class SpeciesTagWidget(QWidget):
         self.progress_label.setText(f"Photo {index + 1} / {total}")
         self.filename_label.setText(path.name)
         self.lens_hint.setText("")
+        self._lens_pending = False
+        self._ai_image = None
 
         pixmap = _rgb_to_pixmap(rgb_thumb).scaled(
             self.preview.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
@@ -256,6 +353,78 @@ class SpeciesTagWidget(QWidget):
         self._rebuild_chips()
         self._refresh_results()
         self.search_edit.setFocus()
+        if self._identifier is not None:
+            self._suggest_whole_photo()
+
+    # --- suggestions IA -------------------------------------------------
+
+    def _suggest_whole_photo(self) -> None:
+        if self._current_rgb is None:
+            return
+        self.whole_photo_btn.hide()
+        self._request_suggestions(self._current_rgb, zone=False)
+
+    def _identify_zone(self) -> None:
+        if self._identifier is None or self._current_rgb is None:
+            return
+        dialog = ZoneDialog(self._current_rgb, parent=self)
+        if dialog.exec() != ZoneDialog.DialogCode.Accepted:
+            return
+        if dialog.zone is None:
+            self._suggest_whole_photo()
+            return
+        self.whole_photo_btn.show()
+        self._request_suggestions(square_zone(self._current_rgb, dialog.zone), zone=True)
+
+    def _request_suggestions(self, rgb: np.ndarray, zone: bool) -> None:
+        self._ai_token += 1
+        self._suggestions = []
+        self._ai_zone = zone
+        self._ai_image = rgb
+        self._rebuild_suggestion_chips()
+        self.ai_status.setText("analyse de la zone…" if zone else "analyse de la photo…")
+        worker = _SuggestWorker(self._identifier, rgb, self.region, self._ai_token, self)
+        worker.done.connect(self._on_suggestions)
+        worker.failed.connect(self._on_suggestions_failed)
+        worker.finished.connect(lambda: self._ai_workers.discard(worker))
+        self._ai_workers.add(worker)
+        worker.start()
+
+    def _on_suggestions(self, token: int, suggestions: list) -> None:
+        if token != self._ai_token:
+            return  # reponse a une photo/zone precedente
+        self._suggestions = suggestions
+        where = "pour la zone encadrée" if self._ai_zone else "pour la photo"
+        if not suggestions:
+            self.ai_status.setText("aucune suggestion pour cette zone géographique")
+        elif suggestions[0].score < LOW_CONFIDENCE:
+            self.ai_status.setText(f"{where}  •  ⚠ l'IA hésite : vérifie, ou essaie Google Lens")
+            self.lens_hint.setText("L'IA hésite sur cette photo : Google Lens peut aider.")
+        else:
+            self.ai_status.setText(f"{where}  •  clic ou Ctrl+1…{len(suggestions)} pour ajouter")
+            if not self._lens_pending:
+                self.lens_hint.setText("")
+        self._rebuild_suggestion_chips()
+
+    def _on_suggestions_failed(self, token: int, message: str) -> None:
+        if token == self._ai_token:
+            self.ai_status.setText(f"indisponible ({message})")
+
+    def _rebuild_suggestion_chips(self) -> None:
+        _clear_layout(self.suggestions_layout)
+        for n, suggestion in enumerate(self._suggestions, start=1):
+            entry = suggestion.entry
+            percent = round(100 * suggestion.score)
+            btn = QPushButton(f"{n}.  {entry.nom_vernaculaire}   {percent if percent >= 1 else '<1'} %")
+            btn.setObjectName("SuggestionChip")
+            btn.setToolTip(f"{entry.nom_scientifique} — {entry.embranchement}")
+            btn.setEnabled(entry not in self._selected)
+            btn.clicked.connect(lambda _=False, e=entry: self._add_species(e))
+            self.suggestions_layout.addWidget(btn)
+
+    def _add_suggestion(self, index: int) -> None:
+        if index < len(self._suggestions):
+            self._add_species(self._suggestions[index].entry)
 
     def _reuse_previous(self) -> None:
         added = [e for e in self._previous if e not in self._selected]
@@ -263,6 +432,7 @@ class SpeciesTagWidget(QWidget):
             return
         self._selected.extend(added)
         self._rebuild_chips()
+        self._rebuild_suggestion_chips()
         self._refresh_results()
         self.search_edit.setFocus()
 
@@ -273,9 +443,32 @@ class SpeciesTagWidget(QWidget):
     def _search_with_google_lens(self) -> None:
         if self._current_rgb is None:
             return
-        QApplication.clipboard().setImage(_rgb_to_pixmap(self._current_rgb).toImage())
+        # meme image que l'IA : la zone encadree s'il y en a une
+        image = self._ai_image if self._ai_zone and self._ai_image is not None else self._current_rgb
+        QApplication.clipboard().setImage(_rgb_to_pixmap(image).toImage())
         QDesktopServices.openUrl(QUrl(GOOGLE_LENS_URL))
-        self.lens_hint.setText("Photo copiée — colle-la (Ctrl+V) sur la page Google Lens qui vient de s'ouvrir.")
+        self._lens_pending = True
+        what = "Zone copiée" if image is not self._current_rgb else "Photo copiée"
+        self.lens_hint.setText(
+            f"{what} — colle-la (Ctrl+V) sur la page Google Lens. Copie ensuite le nom trouvé (Ctrl+C) : "
+            "il sera recherché ici à ton retour."
+        )
+
+    def _on_app_state_changed(self, state: Qt.ApplicationState) -> None:
+        """Retour dans l'application après Google Lens : si un nom a été
+        copié, on le recherche directement."""
+        if not self._lens_pending or state != Qt.ApplicationState.ApplicationActive or not self.isVisible():
+            return
+        mime = QApplication.clipboard().mimeData()
+        if mime is None or mime.hasImage() or not mime.hasText():
+            return  # toujours notre photo : rien de copie depuis Lens pour l'instant
+        text = " ".join(mime.text().split())
+        if not text or len(text) > LENS_NAME_MAX_LEN:
+            return
+        self._lens_pending = False
+        self.search_edit.setText(text)
+        self.search_edit.setFocus()
+        self.lens_hint.setText("Nom copié depuis Google Lens : vérifie le résultat dans la liste.")
 
     def _on_query_changed(self, text: str) -> None:
         self.add_custom_btn.setEnabled(bool(text.strip()))
@@ -326,20 +519,18 @@ class SpeciesTagWidget(QWidget):
         self._selected.append(entry)
         self.search_edit.clear()
         self._rebuild_chips()
+        self._rebuild_suggestion_chips()
         self._refresh_results()
         self.search_edit.setFocus()
 
     def _remove_species(self, entry: SpeciesEntry) -> None:
         self._selected = [e for e in self._selected if e != entry]
         self._rebuild_chips()
+        self._rebuild_suggestion_chips()
         self._refresh_results()
 
     def _rebuild_chips(self) -> None:
-        while self.chips_layout.count():
-            item = self.chips_layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
+        _clear_layout(self.chips_layout)
         for entry in self._selected:
             chip = _Chip(entry)
             chip.remove_clicked.connect(self._remove_species)

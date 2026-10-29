@@ -387,6 +387,13 @@ class ReviewWidget(QWidget):
         return self._current_thumb
 
     @property
+    def current_render(self) -> np.ndarray | None:
+        """Photo en cours telle que choisie : recadrée et corrigée."""
+        if self._current_thumb is None:
+            return None
+        return self._render(self._selected_key, self._current_thumb)
+
+    @property
     def selected_key(self) -> str:
         return self._selected_key
 

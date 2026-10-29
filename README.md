@@ -46,6 +46,18 @@ Le workflow peut aussi être lancé manuellement (onglet *Actions* du dépôt, b
 dans ce cas il compile les 3 plateformes en artefacts téléchargeables, mais ne publie pas de
 Release (seul un tag `v*` le fait).
 
+## Module IA (suggestions d'espèces)
+
+Les suggestions d'espèces reposent sur le modèle BioCLIP 2.5 (Imageomics, licence MIT), exécuté en
+local avec `onnxruntime` (`src/aquabioscope/identify.py`). Le modèle n'est pas dans l'exécutable :
+l'application télécharge à la demande l'archive `aquabioscope-ia-bioclip-2.5-int8.zip` (~450 Mo)
+depuis la Release GitHub `modele-ia`, dans `%LOCALAPPDATA%\AquaBioScope\modele-ia\`.
+
+Pour la (re)fabriquer — à refaire quand `species.csv` change, sinon les espèces ajoutées ne sont
+jamais suggérées : voir `scripts/ia_model/build_ia_model.py`. Pour la publier, créer (une fois) une
+Release `modele-ia` marquée **pré-version** (elle ne doit pas devenir la « dernière version » lue par
+le contrôle de mise à jour) et y déposer l'archive.
+
 ## Microsoft Store
 
 Paquet MSIX et étapes de publication : voir `store/README.md`.
@@ -87,6 +99,6 @@ par le workflow pour un fichier unique portable.
 
 ## État du projet
 
-Pipeline complet fonctionnel : accueil (dossiers, lieu, date, zone, crédit) → revue colorimétrique (4 corrections adaptatives + original, recadrage, retour arrière, séries de photos) → tags d'espèces (base mondiale, 9600+ espèces) → export (retouche pleine résolution, crédit incrusté, renommage, EXIF, inventaire Excel) → compilation en exécutable Windows/macOS/Linux.
+Pipeline complet fonctionnel : accueil (dossiers, lieu, date, zone, crédit) → revue colorimétrique (4 corrections adaptatives + original, recadrage, retour arrière, séries de photos) → tags d'espèces (base mondiale, 9600+ espèces, suggestions par IA en local) → export (retouche pleine résolution, crédit incrusté, renommage, EXIF, inventaire Excel) → compilation en exécutable Windows/macOS/Linux.
 
 Sources de la base d'espèces (données ouvertes) : iNaturalist via GBIF, WoRMS, Wikidata, et TAXREF (Muséum national d'Histoire naturelle, Licence Ouverte Etalab) pour les noms français et la présence en outre-mer.

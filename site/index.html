@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AquaBioScope — Retouche &amp; tag d'espèces pour la plongée</title>
-<meta name="description" content="Logiciel gratuit pour plongeurs : retouche colorimétrique, identification d'espèces et renommage en masse de vos photos sous-marines. Windows, macOS et Linux.">
+<meta name="description" content="Logiciel gratuit pour plongeurs : retouche colorimétrique, identification d'espèces assistée par IA et renommage en masse de vos photos sous-marines. Windows, macOS et Linux.">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -326,7 +326,7 @@
   <div class="wrap">
     <img class="logo" src="logo.png" alt="Logo AquaBioScope" width="150" height="150">
     <h1>AquaBioScope</h1>
-    <p class="tagline">Retouche colorimétrique, identification d'espèces et renommage en masse pour tes photos de plongée sous-marine — un logiciel gratuit, qui se met à jour tout seul.</p>
+    <p class="tagline">Retouche colorimétrique, identification d'espèces assistée par IA et renommage en masse pour tes photos de plongée sous-marine — un logiciel gratuit, qui se met à jour tout seul.</p>
     <div class="btn-meta" id="version-badge"></div>
   </div>
 
@@ -425,8 +425,8 @@
         <div class="icon-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h4M4 4v4M20 4h-4M20 4v4M4 20h4M4 20v-4M20 20h-4M20 20v-4"/><circle cx="12" cy="12" r="3.4"/></svg>
         </div>
-        <h3>Aide à l'identification</h3>
-        <p>Un bouton envoie directement la photo vers Google Lens si une espèce reste introuvable dans la base.</p>
+        <h3>Suggestions d'espèces par IA</h3>
+        <p>L'IA propose les espèces les plus probables de la zone, en un clic : sur nos photos de test, la bonne est la première suggestion 7 fois sur 10, et parmi les cinq 9 fois sur 10. Elle tourne sur ton ordinateur, sans connexion ; quand elle hésite, Google Lens prend le relais.</p>
       </div>
     </div>
   </div>
@@ -444,6 +444,7 @@
         <h3>Nouvelle session</h3>
         <p>Indique le dossier de tes photos brutes (JPG ou RAW), un dossier de sortie, le lieu et la date de la plongée, la zone géographique, et ton nom pour le crédit photo.</p>
         <p>Ces informations sont mémorisées d'une session à l'autre — rien à ressaisir à chaque plongée.</p>
+        <p>Coche « Suggérer les espèces par IA » pour être aidé à l'identification : la première fois, l'application télécharge le module IA (environ 450 Mo), qui fonctionne ensuite sans connexion.</p>
         <p>Les RAW sont pris en charge, y compris les ORF des Olympus / OM System TG (mis au point sur le TG-6) : l'application garde le rendu et les corrections d'objectif de l'appareil (distorsion, vignetage, bruit), et y ajoute le fin détail du RAW en pleine résolution.</p>
       </div>
       <div class="step-img"><img class="shot" src="screenshots/01_accueil.png" alt="Écran de démarrage d'une session AquaBioScope"></div>
@@ -468,10 +469,10 @@
       <div class="step-text">
         <span class="step-num">3</span>
         <h3>Identification des espèces</h3>
-        <p>Recherche et tague les espèces visibles sur la photo. La recherche tolère les fautes de frappe et les pluriels, et affiche l'embranchement de chaque résultat.</p>
-        <p>Une série sur le même sujet ? Tague-la une fois pour toutes, ou reprends les espèces de la photo précédente en un clic. Une espèce introuvable ? Ajoute-la librement, ou envoie la photo vers Google Lens.</p>
+        <p>Avec l'option IA, les cinq espèces les plus probables s'affichent déjà : un clic (ou Ctrl+1 à 5) pour les ajouter. Plusieurs espèces sur la photo ? « Identifier une zone » fait analyser seulement le sujet que tu encadres.</p>
+        <p>Sinon, recherche par nom commun, nom de plongeur ou nom scientifique : la recherche tolère les fautes de frappe et les pluriels, et affiche l'embranchement de chaque résultat. Une série sur le même sujet ? Tague-la une fois pour toutes, ou reprends les espèces de la photo précédente en un clic. Une espèce introuvable ? Ajoute-la librement, ou envoie la photo vers Google Lens : le nom que tu y copies est recherché à ton retour.</p>
       </div>
-      <div class="step-img"><img class="shot" src="screenshots/03_especes.png" alt="Écran de tag d'espèces avec recherche et chips"></div>
+      <div class="step-img"><img class="shot" src="screenshots/03_especes.png" alt="Écran de tag d'espèces avec les suggestions de l'IA"></div>
     </div>
 
     <div class="step reverse">
@@ -533,7 +534,7 @@
 </section>
 
 <footer>
-  AquaBioScope — logiciel gratuit pour plongeurs, sans compte ni suivi. Base d'espèces construite à partir de données ouvertes : iNaturalist, GBIF, WoRMS, Wikidata et TAXREF (Muséum national d'Histoire naturelle).
+  AquaBioScope — logiciel gratuit pour plongeurs, sans compte ni suivi. Base d'espèces construite à partir de données ouvertes : iNaturalist, GBIF, WoRMS, Wikidata et TAXREF (Muséum national d'Histoire naturelle). Suggestions d'espèces : modèle BioCLIP 2.5 de l'Imageomics Institute (licence MIT).
 </footer>
 
 <script>

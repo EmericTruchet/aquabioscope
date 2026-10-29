@@ -7,10 +7,12 @@ from pathlib import Path
 from PySide6.QtCore import Signal, QDate, QSettings
 from PySide6.QtWidgets import (
     QWidget, QFormLayout, QLineEdit, QPushButton, QHBoxLayout, QVBoxLayout,
-    QDateEdit, QLabel, QFileDialog, QMessageBox, QComboBox,
+    QDateEdit, QLabel, QFileDialog, QMessageBox, QComboBox, QCheckBox,
 )
 
+from aquabioscope import identify
 from aquabioscope.session import REGIONS, DiveSession
+from aquabioscope.ui.ia_download import ensure_model_installed
 
 _ORG, _APP = "AquaBioScope", "AquaBioScope"
 
@@ -62,6 +64,12 @@ class OnboardingWidget(QWidget):
         self.date_edit = QDateEdit(QDate.currentDate())
         self.date_edit.setCalendarPopup(True)
         self.date_edit.setDisplayFormat("dd/MM/yyyy")
+        self.ai_checkbox = QCheckBox("✨ Suggérer les espèces par IA")
+        self.ai_checkbox.setToolTip(
+            "Propose en un clic les espèces les plus probables pour chaque photo, parmi celles de la zone. "
+            "Fonctionne sans connexion ; le module IA est téléchargé une seule fois "
+            f"({identify.MODEL_SIZE_LABEL}) au premier usage."
+        )
 
         self._restore_last_values()
 
@@ -74,6 +82,7 @@ class OnboardingWidget(QWidget):
         form.addRow("Zone", self.region_combo)
         form.addRow("Date de plongée", self.date_edit)
         form.addRow("Crédit photo (photographe)", self.photographer_edit)
+        form.addRow("", self.ai_checkbox)
 
         start_btn = QPushButton("Commencer la session  →")
         start_btn.setMinimumHeight(40)
@@ -111,6 +120,7 @@ class OnboardingWidget(QWidget):
         last_photographer = self._settings.value("last_photographer", "", str)
         last_site = self._settings.value("last_dive_site", "", str)
         last_region = self._settings.value("last_region", "", str)
+        self.ai_checkbox.setChecked(self._settings.value("ai_suggestions", False, bool))
         if last_output:
             self.output_picker.set_path(last_output)
         if last_photographer:
@@ -127,6 +137,7 @@ class OnboardingWidget(QWidget):
         self._settings.setValue("last_photographer", session.photographer)
         self._settings.setValue("last_dive_site", session.dive_site)
         self._settings.setValue("last_region", session.region)
+        self._settings.setValue("ai_suggestions", session.ai_suggestions)
 
     def _on_start(self) -> None:
         errors = []
@@ -148,6 +159,11 @@ class OnboardingWidget(QWidget):
 
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        ai_suggestions = self.ai_checkbox.isChecked()
+        if ai_suggestions and not ensure_model_installed(self):
+            ai_suggestions = False
+            self.ai_checkbox.setChecked(False)
+
         session = DiveSession(
             input_dir=input_dir,
             output_dir=output_dir,
@@ -155,6 +171,7 @@ class OnboardingWidget(QWidget):
             dive_date=self.date_edit.date().toPython(),
             photographer=self.photographer_edit.text().strip(),
             region=self.region_combo.currentData(),
+            ai_suggestions=ai_suggestions,
         )
         self._remember_values(session)
         self.session_ready.emit(session)

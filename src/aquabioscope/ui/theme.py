@@ -167,6 +167,21 @@ QPushButton#ChipRemove:hover {{
     color: white;
 }}
 
+QPushButton#SuggestionChip {{
+    background: {CARD};
+    color: {TEXT};
+    border: 1px dashed {ACCENT};
+    border-radius: 13px;
+    padding: 4px 12px;
+    font-weight: 400;
+}}
+QPushButton#SuggestionChip:hover {{ background: {ACCENT_SOFT}; }}
+QPushButton#SuggestionChip:disabled {{
+    background: {BG};
+    color: #9AA8AE;
+    border: 1px dashed {BORDER};
+}}
+
 QWidget#Badge {{
     background: {ACCENT_DARK};
     border-radius: 8px;
