@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/compteur.php';
 require __DIR__ . '/demandes.php';
+require __DIR__ . '/github.php';
 
 // La cle n'est pas dans le depot (public) : stats.cle.php, present seulement
 // sur le serveur, la renvoie (<?php return '...';). Il est ecrit lors de la mise
@@ -68,6 +69,30 @@ for ($i = 0; $i < 30; $i++) {
 }
 $peak = max(1, max($last30));
 $first_day = array_key_first($days);
+
+// Telechargements GitHub (installations + mises a jour automatiques)
+$gh = github_downloads();
+$gh_total = $gh_setup = $gh_model = 0;
+$gh_platforms = ['Windows' => 0, 'macOS' => 0, 'Linux' => 0];
+$gh_versions = [];
+foreach ($gh['versions'] ?? [] as $tag => $release) {
+    $count = array_sum($release['files']);
+    if ($tag === GITHUB_MODEL_TAG) {
+        $gh_model += $count;
+        continue;
+    }
+    $setup = (int) ($release['files']['AquaBioScope-Setup.exe'] ?? 0); // installateur : site + mises a jour
+    $gh_total += $count;
+    $gh_setup += $setup;
+    foreach ($release['files'] as $file => $n) {
+        $gh_platforms[github_platform($file)] += $n;
+    }
+    $gh_versions[$tag] = ['date' => $release['date'], 'total' => $count, 'setup' => $setup];
+}
+$gh_versions = array_reverse($gh_versions, true);
+// Le bouton Windows du site et la mise a jour automatique telechargent le meme
+// installateur : ce qui depasse les clics du site vient (a peu pres) des mises a jour.
+$gh_updates = max(0, $gh_setup - (int) ($data['platforms']['windows'] ?? 0));
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -131,7 +156,38 @@ $first_day = array_key_first($days);
     <?php endforeach; ?>
   </div>
 
-  <h2>30 derniers jours, tous systèmes</h2>
+  <h2>Téléchargements GitHub (mises à jour comprises)</h2>
+  <?php if ($gh === null): ?>
+  <p class="empty">GitHub est injoignable pour l'instant : réessaie dans un moment.</p>
+  <?php else: ?>
+  <p class="sub">Tous les fichiers des Releases, installations et mises à jour automatiques comprises
+    (hors Microsoft Store). Compte aussi quelques robots, surtout le jour de chaque sortie.
+    Chiffres mis à jour au plus toutes les heures (dernière lecture à <?= date('H:i', (int) $gh['fetched']) ?>).</p>
+  <div class="cards four">
+    <div class="card main"><span class="num"><?= $gh_total ?></span><span class="label">téléchargements de l'appli</span></div>
+    <div class="card"><span class="num"><?= $gh_setup ?></span><span class="label">installateur Windows</span></div>
+    <div class="card"><span class="num">≈ <?= $gh_updates ?></span><span class="label">mises à jour auto Windows</span></div>
+    <div class="card"><span class="num"><?= $gh_model ?></span><span class="label">modules IA</span></div>
+  </div>
+  <div class="cards three">
+    <?php foreach ($gh_platforms as $platform => $count): ?>
+    <div class="card"><span class="num"><?= $count ?></span><span class="label"><?= $platform ?></span></div>
+    <?php endforeach; ?>
+  </div>
+  <table>
+    <?php foreach ($gh_versions as $tag => $v): ?>
+    <tr>
+      <td class="day"><?= htmlspecialchars($tag) ?></td>
+      <td class="meta">publiée le <?= date('d/m/Y', strtotime($v['date'])) ?><?= $v['setup'] ? ' · dont ' . $v['setup'] . ' installateur Windows' : '' ?></td>
+      <td class="count"><?= $v['total'] ?></td>
+    </tr>
+    <?php endforeach; ?>
+  </table>
+  <p class="sub" style="margin-top: 10px">« Mises à jour auto » : installateur Windows téléchargé moins les clics
+    Windows du site (même fichier), donc une estimation.</p>
+  <?php endif; ?>
+
+  <h2 class="section">30 derniers jours, tous systèmes</h2>
   <table>
     <?php foreach ($last30 as $day => $count): ?>
     <tr>

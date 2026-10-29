@@ -15,6 +15,7 @@ appimagetool
 /site/AquaBioScope.exe
 /site/compteur.data.php
 /site/demandes.data.php
+/site/github.cache.php
 # generee a la mise en ligne depuis NOUVEAUTES.md (scripts/build_notes_page.py)
 /site/nouveautes.html
 /site/stats.cle.php

@@ -60,7 +60,7 @@ jobs:
         run: |
           host="${FTP_SERVER#*://}"; host="${host%%/*}"
           mirror="mirror --reverse --verbose --no-perms \
-            --exclude-glob compteur.data.php --exclude-glob demandes.data.php --exclude-glob AquaBioScope.exe site/ ."
+            --exclude-glob compteur.data.php --exclude-glob demandes.data.php --exclude-glob github.cache.php --exclude-glob AquaBioScope.exe site/ ."
           # SFTP en priorite, sinon FTP chiffre (FTPS). Jamais de FTP en clair.
           if lftp --env-password -u "$FTP_USERNAME" \
                -e "set sftp:auto-confirm yes; set net:max-retries 2; set net:timeout 30; $mirror; bye" \
