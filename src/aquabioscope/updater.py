@@ -42,6 +42,7 @@ class UpdateInfo:
     version: str
     page_url: str
     installer_url: str | None
+    notes: str = ""  # nouveautes de la version (texte de la Release, en Markdown)
 
 
 def parse_version(text: str) -> tuple[int, ...]:
@@ -95,6 +96,7 @@ def check_for_update(timeout: float = 6.0) -> UpdateInfo | None:
         version=tag.lstrip("vV"),
         page_url=str(release.get("html_url") or RELEASES_PAGE),
         installer_url=installer_url,
+        notes=str(release.get("body") or "").strip(),
     )
 
 

@@ -52,10 +52,16 @@ jobs:
             dist/AquaBioScope.exe
             dist/AquaBioScope-Setup.exe
 
+      - name: Note de version (section de NOUVEAUTES.md)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: python scripts/release_notes.py ${{ github.ref_name }} release_notes.md
+
       - name: Ajout au Release GitHub (si déclenché par un tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          # note affichee aussi dans l'application avant la mise a jour (updater.UpdateInfo.notes)
+          body_path: release_notes.md
           # AquaBioScope-Setup.exe : nom attendu par la mise a jour
           # automatique (aquabioscope.updater.INSTALLER_ASSET), ne pas le changer.
           files: |

@@ -25,6 +25,9 @@ Le résultat est généré dans `dist\AquaBioScope\` (à distribuer en entier, v
 
 1. Monter le numéro dans `src/aquabioscope/__init__.py` (`__version__ = "x.y.z"`) — c'est la seule
    source de vérité, `pyproject.toml` la lit dynamiquement.
+   Ajouter une section `## x.y.z` dans `NOUVEAUTES.md`, en langage utilisateur : elle devient la
+   note de la Release GitHub et s'affiche dans l'application avant la mise à jour (le build du tag
+   échoue si elle manque, et un test aussi).
 2. Commiter, puis taguer et pousser le tag :
    ```powershell
    git tag vx.y.z
