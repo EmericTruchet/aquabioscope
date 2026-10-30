@@ -79,6 +79,7 @@ class _ScalablePreview(QLabel):
         self._drag_start: QPointF | None = None
         self._pan_at_drag_start = QPointF(0, 0)
         self._dragged = False
+        self._after_double_click = False  # le relachement qui suit un double-clic ne valide pas
 
     def set_source_pixmap(self, pixmap: QPixmap) -> None:
         self._source = pixmap
@@ -181,11 +182,17 @@ class _ScalablePreview(QLabel):
         was_dragged = self._dragged
         self._drag_start = None
         self._dragged = False
+        if self._after_double_click:
+            # double-clic = revenir a la photo entiere ; sans ce garde-fou, le
+            # 2e relachement (zoom deja remis a 1) validait la photo
+            self._after_double_click = False
+            return
         if not was_dragged and self._zoom <= MIN_ZOOM + 1e-6:
             self.clicked.emit()
 
     def mouseDoubleClickEvent(self, event) -> None:  # noqa: N802
         super().mouseDoubleClickEvent(event)
+        self._after_double_click = True
         self.reset_zoom()
 
 
